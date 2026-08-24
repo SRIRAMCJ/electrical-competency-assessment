@@ -1,0 +1,6 @@
+{
+  "module": "electrical",
+  "title": "Electrical Competency Assessment",
+  "submodules": ["Motor Maintenance","LT & HT Feeder & Components Maintenance","Cable & Lighting System","Transformer","HT Relay Settings & Maintenance","UPS & Battery Maintenance","VFD Maintenance","Electrical Measurement Systems","Rectifier Cubicle Maintenance","Switchyard Maintenance","Basic Electrical Safety"],
+  "activityTypes": ["mcq","multiple_choice","fill_blank","drag_drop","pick_place","match","ordering","image_identification","scenario","typing","code_output","timed_challenge","simulation"]
+}
