@@ -1,0 +1,1 @@
+Internal note: the circuit attempt model includes switch_closed in the next schema revision.
