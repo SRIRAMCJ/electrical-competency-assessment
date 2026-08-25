@@ -1,0 +1,65 @@
+name: Add employee performance summary
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: ${{ !contains(github.event.head_commit.message, 'auto: performance summary') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Patch result summary
+        run: |
+          python3 <<'PY'
+          from pathlib import Path
+          import re
+
+          p=Path('frontend/src/App.tsx')
+          s=p.read_text()
+
+          old="if(stage==='result')return <Result knowledge={knowledge} practical={practical} total={total} percentage={percentage} onReset={reset}/>;"
+          new="if(stage==='result')return <Result knowledge={knowledge} practical={practical} total={total} percentage={percentage} errors={errors} timeUsed={600-time} onReset={reset}/>;"
+          if old not in s:
+              raise SystemExit('Result invocation not found')
+          s=s.replace(old,new,1)
+
+          pattern=r"function Result\([\s\S]*?\nconst css=`"
+          replacement=r'''function Result({knowledge,practical,total,percentage,errors,timeUsed,onReset}:{knowledge:number;practical:number;total:number;percentage:number;errors:number;timeUsed:number;onReset:()=>void}){
+          const level=percentage>=85?'Advanced':percentage>=70?'Proficient':percentage>=50?'Developing':'Needs Training';
+          const quizAccuracy=Math.round(knowledge/questions.length*100);
+          const practicalAccuracy=Math.round(Math.min(4,Math.max(0,practical/10))/4*100);
+          const mins=Math.floor(timeUsed/60); const secs=String(timeUsed%60).padStart(2,'0');
+          const summary=percentage>=85?'Excellent performance. The employee demonstrated strong electrical fundamentals and completed the practical circuit validation successfully.':percentage>=70?'Good performance. The employee shows a workable understanding of electrical fundamentals and practical wiring, with some areas that need reinforcement.':percentage>=50?'Developing competency. The employee understands some fundamentals but needs additional supervised practice before independent work.':'Training required. The employee needs focused electrical fundamentals and practical wiring training before competency can be considered satisfactory.';
+          const recommendations=errors===0&&percentage>=85?'Maintain competency through periodic refresher assessments and practical drills.':quizAccuracy<70&&practicalAccuracy>=70?'Focus on electrical theory, units, measurement and circuit fundamentals.':practicalAccuracy<70?'Repeat supervised circuit assembly and wire-identification exercises.':'Review missed questions and repeat the practical validation after targeted training.';
+          return <Shell><div className="result"><div className="eyebrow">ASSESSMENT COMPLETE</div><h1>Employee <span>Performance Report</span></h1><div className="scoreCircle"><b>{percentage}%</b><small>{level}</small></div><div className="performanceSummary"><b>Performance Summary</b><p>{summary}</p><div className="summaryGrid"><div><small>Knowledge accuracy</small><strong>{quizAccuracy}%</strong><span>{knowledge}/{questions.length} correct</span></div><div><small>Practical accuracy</small><strong>{practicalAccuracy}%</strong><span>{Math.min(4,Math.max(0,Math.round(practical/10)))}/4 connections</span></div><div><small>Practical errors</small><strong>{errors}</strong><span>incorrect attempts</span></div><div><small>Quiz time</small><strong>{mins}:{secs}</strong><span>time used</span></div></div><div className="recommendation"><b>Recommended next step</b><p>{recommendations}</p></div></div><div className="resultGrid"><div><small>Knowledge</small><b>{knowledge}/10</b></div><div><small>Practical</small><b>{practical}/60</b></div><div><small>Total</small><b>{total}/70</b></div></div><button className="primary big" onClick={onReset}>Retake assessment ↻</button></div></Shell>}
+const css=`'''
+          s2,n=re.subn(pattern,replacement,s,count=1)
+          if n!=1: raise SystemExit('Result function not found')
+          s=s2
+
+          css=r'''
+          .performanceSummary{margin:28px auto;text-align:left;background:#fff;border:1px solid #e1e6ee;border-radius:20px;padding:24px;box-shadow:0 12px 35px #1720330b}.performanceSummary>b{font-size:18px}.performanceSummary>p{color:#69768a;line-height:1.65;margin:10px 0 20px}.summaryGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.summaryGrid>div{border:1px solid #e5e9ef;border-radius:14px;padding:15px;background:#fafbfc}.summaryGrid small,.summaryGrid strong,.summaryGrid span{display:block}.summaryGrid small{font-size:10px;color:#7c889b}.summaryGrid strong{font-size:24px;margin:5px 0}.summaryGrid span{font-size:10px;color:#8a95a6}.recommendation{margin-top:15px;padding:14px 16px;border-radius:13px;background:#eef4ff}.recommendation b{font-size:11px;color:#3863ed}.recommendation p{margin:5px 0 0!important;font-size:12px!important;color:#59677d!important}.performanceSummary+.resultGrid{margin-bottom:22px}@media(max-width:950px){.summaryGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:650px){.summaryGrid{grid-template-columns:1fr}}
+          '''
+          marker='*{box-sizing:border-box}'
+          if marker not in s: raise SystemExit('CSS marker not found')
+          s=s.replace(marker,marker+css,1)
+          p.write_text(s)
+          PY
+
+      - name: Verify build
+        working-directory: frontend
+        run: npm ci && npm run build
+
+      - name: Commit patched app
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/src/App.tsx
+          git commit -m "auto: performance summary" || exit 0
+          git push
