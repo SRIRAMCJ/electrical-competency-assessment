@@ -1,307 +1,70 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
-type Scenario = {
-  title: string;
-  icon: string;
-  observation: string;
-  question: string;
-  options: string[];
-  answer: number;
-  explanation: string;
-};
+type Scenario={title:string;icon:string;observation:string;question:string;options:string[];answer:number;explanation:string};
 
-const scenarios: Scenario[] = [
-  {
-    title: 'Dead Lamp — Find the Fault',
-    icon: '💡',
-    observation: 'The 12V lamp does not turn ON. The battery is healthy and the switch is ON. The fuse looks open.',
-    question: 'What should the technician do first?',
-    options: ['Replace the fuse with a higher rating', 'Replace the blown fuse with the correct rated fuse', 'Short the fuse temporarily', 'Increase the battery voltage'],
-    answer: 1,
-    explanation: 'A blown fuse indicates overcurrent protection has operated. Replace it only with the correct rated fuse after checking the cause.'
-  },
-  {
-    title: 'Meter Challenge — Choose the Right Mode',
-    icon: '🔧',
-    observation: 'You need to measure the voltage directly across a powered 12V battery.',
-    question: 'Which meter setup is correct?',
-    options: ['DC voltage mode, probes across + and −', 'Current mode, probes across + and −', 'Resistance mode across a powered battery', 'AC voltage mode across + and −'],
-    answer: 0,
-    explanation: 'A battery provides DC voltage. Voltage is measured across the source, with the meter in DC voltage mode.'
-  },
-  {
-    title: 'Safety Challenge — Before Energising',
-    icon: '⚠️',
-    observation: 'You have assembled a circuit but the wire colours and terminals have not been checked yet.',
-    question: 'What is the safest next action?',
-    options: ['Energise it immediately', 'Touch the terminals to test them', 'Verify connections, polarity and protection before energising', 'Remove the fuse and energise the circuit'],
-    answer: 2,
-    explanation: 'A competent technician verifies polarity, connections and protection before applying power.'
-  }
+const scenarios:Scenario[]=[
+ {title:'Dead Lamp — Find the Fault',icon:'💡',observation:'The 12V lamp does not turn ON. The battery is healthy and the switch is ON. The fuse looks open.',question:'What should the technician do first?',options:['Replace the fuse with a higher rating','Replace the blown fuse with the correct rated fuse','Short the fuse temporarily','Increase the battery voltage'],answer:1,explanation:'A blown fuse indicates overcurrent protection has operated. Replace it only with the correct rated fuse after checking the cause.'},
+ {title:'Meter Challenge — Choose the Right Mode',icon:'🔧',observation:'You need to measure the voltage directly across a powered 12V battery.',question:'Which meter setup is correct?',options:['DC voltage mode, probes across + and −','Current mode, probes across + and −','Resistance mode across a powered battery','AC voltage mode across + and −'],answer:0,explanation:'A battery provides DC voltage. Voltage is measured across the source, with the meter in DC voltage mode.'},
+ {title:'Safety Challenge — Before Energising',icon:'⚠️',observation:'You have assembled a circuit but the wire colours and terminals have not been checked yet.',question:'What is the safest next action?',options:['Energise it immediately','Touch the terminals to test them','Verify connections, polarity and protection before energising','Remove the fuse and energise the circuit'],answer:2,explanation:'A competent technician verifies polarity, connections and protection before applying power.'}
 ];
 
-export default function InteractiveActivity({ onFinish }: { onFinish: (score: number) => void }) {
-  const [round, setRound] = useState(0);
-  const [score, setScore] = useState(0);
-  const [selected, setSelected] = useState<number | null>(null);
-  const [checked, setChecked] = useState(false);
-  const scenario = scenarios[round];
-  const correct = selected === scenario.answer;
-  const progress = useMemo(() => Math.round((round / scenarios.length) * 100), [round]);
+const mcq=[
+ ['What is the SI unit of electrical current?','Ampere','Electrical current is measured in amperes (A).'],
+ ['Which instrument measures electrical current?','Ammeter','An ammeter is used to measure electrical current.'],
+ ["Which equation represents Ohm's law?",'V = I × R',"Ohm's law relates voltage, current and resistance as V = I × R."],
+ ['What is the SI unit of resistance?','Ohm','Resistance is measured in ohms (Ω).'],
+ ['What is the primary purpose of a fuse?','Protect against excessive current','A fuse interrupts the circuit when excessive current flows.'],
+ ['In a series circuit, total resistance is:','The sum of resistances','Series resistances add together: Rtotal = R1 + R2 + …'],
+ ['Which current periodically changes direction?','AC','Alternating current periodically changes direction.'],
+ ['What is the SI unit of electrical power?','Watt','Electrical power is measured in watts (W).'],
+ ['In an ideal parallel circuit, what is common across each branch?','Voltage','Parallel branches share the same voltage across their terminals.'],
+ ['Which device opens or closes an electrical circuit?','Switch','A switch controls the circuit by opening or closing the electrical path.']
+] as const;
 
-  const choose = (index: number) => {
-    if (checked) return;
-    setSelected(index);
-    setChecked(true);
-    if (index === scenario.answer) setScore((value) => value + 5);
-  };
-
-  const next = () => {
-    if (round === scenarios.length - 1) {
-      onFinish(score);
-      return;
-    }
-    setRound((value) => value + 1);
-    setSelected(null);
-    setChecked(false);
-  };
-
-  return (
-    <div className="activityPage">
-      <style>{activityCss}</style>
-
-      <header className="activityHeader">
-        <div>
-          <div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div>
-          <strong>Technical Activity</strong>
-        </div>
-        <div className="activityScore">⚡ {score}/15</div>
-      </header>
-
-      <main className="activityMain">
-        <div className="activityIntro">
-          <div className="introCopy">
-            <div className="eyebrow">STAGE 2 • INTERACTIVE VALIDATION</div>
-            <h1>Electrical <span>Troubleshooting Lab</span></h1>
-            <p>Inspect each field situation, choose the safest technical action, and validate your decision.</p>
-          </div>
-          <div className="activityProgress">
-            <b>{round + 1}/3</b>
-            <small>challenges</small>
-          </div>
-        </div>
-
-        <div className="activityTrack" aria-label="Activity progress">
-          <i style={{ width: `${Math.max(progress, 33.33)}%` }} />
-        </div>
-
-        <section className="activityGrid">
-          <aside className="activityCard activityScenario">
-            <div className="scenarioIcon">{scenario.icon}</div>
-            <div className="eyebrow">FIELD SCENARIO</div>
-            <h2>{scenario.title}</h2>
-            <p>{scenario.observation}</p>
-            <div className="scenarioRule">
-              <b>Technician rule</b>
-              <span>Think → inspect → verify → act</span>
-            </div>
-          </aside>
-
-          <section className="activityCard activityQuestion">
-            <div className="questionMeta">
-              <span>Challenge {round + 1} of {scenarios.length}</span>
-              <span>5 points</span>
-            </div>
-            <h2>{scenario.question}</h2>
-
-            <div className="activityOptions">
-              {scenario.options.map((option, index) => {
-                const state = !checked ? '' : index === scenario.answer ? 'correct' : index === selected ? 'wrong' : '';
-                return (
-                  <button key={option} className={state} onClick={() => choose(index)} disabled={checked}>
-                    <b>{String.fromCharCode(65 + index)}</b>
-                    <span>{option}</span>
-                    {checked && index === scenario.answer && <em>✓</em>}
-                    {checked && index === selected && index !== scenario.answer && <em>×</em>}
-                  </button>
-                );
-              })}
-            </div>
-
-            {checked && (
-              <div className={`activityFeedback ${correct ? 'good' : 'bad'}`}>
-                <b>{correct ? 'Correct decision' : 'Review this decision'}</b>
-                <p>{scenario.explanation}</p>
-              </div>
-            )}
-
-            <div className="activityActions">
-              <span>{checked ? (correct ? '+5 points' : '0 points') : 'Select one answer to validate'}</span>
-              {checked && (
-                <button className="activityPrimary" onClick={next}>
-                  {round === scenarios.length - 1 ? 'Continue to circuit →' : 'Next challenge →'}
-                </button>
-              )}
-            </div>
-          </section>
-        </section>
-      </main>
-    </div>
-  );
+// The MCQ component is local to App.tsx, so this lightweight tracker records the
+// selected option from the rendered quiz and builds the review section when Result appears.
+function installReportTracker(){
+ if(typeof window==='undefined'||window.__electricalReportTracker)return;
+ window.__electricalReportTracker=true;
+ const key='electrical-assessment-mcq-answers';
+ sessionStorage.removeItem(key);
+ const answers:Record<string,string>={};
+ const observer=new MutationObserver(()=>{
+  const result=document.querySelector('.result');
+  if(!result||result.querySelector('.wrongAnswersReport'))return;
+  const raw=sessionStorage.getItem(key); if(!raw)return;
+  const saved=JSON.parse(raw) as Record<string,string>;
+  const wrong=mcq.map((item,i)=>({i,q:item[0],correct:item[1],explanation:item[2],selected:saved[String(i)]})).filter(x=>!x.selected||x.selected!==x.correct);
+  const section=document.createElement('section');
+  section.className='wrongAnswersReport';
+  section.innerHTML=`<div class="warEyebrow">KNOWLEDGE REVIEW</div><h2>Questions to Review</h2><p class="warIntro">These are the MCQs answered incorrectly or left unanswered. The correct answer and a short explanation are shown for each one.</p>`;
+  if(!wrong.length){section.innerHTML+=`<div class="warPerfect">✓ All 10 fundamentals questions were answered correctly.</div>`}else{
+   wrong.forEach(x=>{const card=document.createElement('article');card.className='warCard';card.innerHTML=`<div class="warTop"><b>Q${x.i+1}</b><span>${x.selected?'Incorrect':'Not answered'}</span></div><h3>${x.q}</h3><div class="warAnswer"><div><small>Your answer</small><strong>${x.selected||'Not answered'}</strong></div><div><small>Correct answer</small><strong>${x.correct}</strong></div></div><p>${x.explanation}</p>`;section.appendChild(card)});
+  }
+  result.appendChild(section);
+  const style=document.createElement('style');style.textContent=`.wrongAnswersReport{margin-top:30px;text-align:left;background:#fff;border:1px solid #e1e6ee;border-radius:20px;padding:24px;box-shadow:0 12px 35px #1720330b}.warEyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#3863ed}.wrongAnswersReport h2{font-size:26px;margin:8px 0}.warIntro{color:#68758b;font-size:12px;line-height:1.6;margin:0 0 18px}.warCard{border:1px solid #e1e6ee;border-radius:15px;padding:16px;margin-top:12px;background:#fbfcfe}.warTop{display:flex;justify-content:space-between;align-items:center}.warTop b{background:#eef4ff;color:#3863ed;border-radius:8px;padding:5px 9px;font-size:11px}.warTop span{font-size:10px;font-weight:900;color:#b42318}.warCard h3{font-size:15px;line-height:1.4;margin:12px 0}.warAnswer{display:grid;grid-template-columns:1fr 1fr;gap:10px}.warAnswer>div{background:#fff;border:1px solid #e1e6ee;border-radius:10px;padding:10px}.warAnswer small,.warAnswer strong{display:block}.warAnswer small{font-size:9px;color:#7b8799}.warAnswer strong{font-size:12px;margin-top:4px}.warAnswer>div:last-child{border-color:#b8e6c7;background:#f2fcf5}.warCard p{font-size:11px;color:#68758b;line-height:1.55;margin:11px 0 0}.warPerfect{padding:14px;border-radius:12px;background:#f2fcf5;border:1px solid #b8e6c7;color:#16824b;font-weight:800;font-size:12px}@media(max-width:600px){.warAnswer{grid-template-columns:1fr}}`;document.head.appendChild(style);
+ });
+ document.addEventListener('click',event=>{
+  const target=event.target as HTMLElement;const button=target.closest('.options button') as HTMLButtonElement|null;
+  if(!button)return;
+  const card=button.closest('.questionCard');if(!card)return;
+  const question=card.querySelector('h2')?.textContent?.trim();if(!question)return;
+  const qIndex=mcq.findIndex(x=>x[0]===question);if(qIndex<0)return;
+  const answer=button.textContent?.replace(/^[A-D]\s*/,'').trim();if(!answer)return;
+  answers[String(qIndex)]=answer;sessionStorage.setItem(key,JSON.stringify(answers));
+ },true);
+ observer.observe(document.body,{childList:true,subtree:true});
 }
 
-const activityCss = `
-*{box-sizing:border-box}
-.activityPage{
-  min-height:100vh;
-  width:100%;
-  padding:0 28px 60px;
-  background:radial-gradient(circle at 50% 0,#fff 0,#f3f6fb 65%);
-  color:#172033;
-  font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+if(typeof window!=='undefined')installReportTracker();
+
+declare global{interface Window{__electricalReportTracker?:boolean}}
+
+export default function InteractiveActivity({onFinish}:{onFinish:(score:number)=>void}){
+ const[round,setRound]=useState(0);const[score,setScore]=useState(0);const[selected,setSelected]=useState<number|null>(null);const[checked,setChecked]=useState(false);const scenario=scenarios[round];const correct=selected===scenario.answer;const progress=useMemo(()=>Math.round((round/scenarios.length)*100),[round]);
+ const choose=(index:number)=>{if(checked)return;setSelected(index);setChecked(true);if(index===scenario.answer)setScore(v=>v+5)};
+ const next=()=>{if(round===scenarios.length-1){onFinish(score);return}setRound(v=>v+1);setSelected(null);setChecked(false)};
+ return <div className="activityPage"><style>{css}</style><header className="activityHeader"><div><div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div><strong>Technical Activity</strong></div><div className="activityScore">⚡ {score}/15</div></header><main className="activityMain"><div className="activityIntro"><div><div className="eyebrow">STAGE 2 • INTERACTIVE VALIDATION</div><h1>Electrical <span>Troubleshooting Lab</span></h1><p>Inspect each field situation, choose the safest technical action, and validate your decision.</p></div><div className="activityProgress"><b>{round+1}/3</b><small>challenges</small></div></div><div className="activityTrack"><i style={{width:`${Math.max(progress,33.33)}%`}}/></div><section className="activityGrid"><aside className="activityCard activityScenario"><div className="scenarioIcon">{scenario.icon}</div><div className="eyebrow">FIELD SCENARIO</div><h2>{scenario.title}</h2><p>{scenario.observation}</p><div className="scenarioRule"><b>Technician rule</b><span>Think → inspect → verify → act</span></div></aside><section className="activityCard activityQuestion"><div className="questionMeta"><span>Challenge {round+1} of {scenarios.length}</span><span>5 points</span></div><h2>{scenario.question}</h2><div className="activityOptions">{scenario.options.map((option,index)=>{const state=!checked?'':index===scenario.answer?'correct':index===selected?'wrong':'';return <button key={option} className={state} onClick={()=>choose(index)} disabled={checked}><b>{String.fromCharCode(65+index)}</b><span>{option}</span>{checked&&index===scenario.answer&&<em>✓</em>}{checked&&index===selected&&index!==scenario.answer&&<em>×</em>}</button>})}</div>{checked&&<div className={`activityFeedback ${correct?'good':'bad'}`}><b>{correct?'Correct decision':'Review this decision'}</b><p>{scenario.explanation}</p></div>}<div className="activityActions"><span>{checked?(correct?'+5 points':'0 points'):'Select one answer to validate'}</span>{checked&&<button className="activityPrimary" onClick={next}>{round===scenarios.length-1?'Continue to circuit →':'Next challenge →'}</button>}</div></section></section></main></div>;
 }
-.activityHeader{
-  width:100%;
-  max-width:1240px;
-  margin:0 auto;
-  padding:22px 0;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:20px;
-}
-.activityHeader strong{display:block;font-size:20px;margin-top:3px}
-.eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#71809a;text-transform:uppercase}
-.activityScore{
-  min-width:92px;
-  padding:11px 16px;
-  border-radius:14px;
-  background:#141c2e;
-  color:#fff;
-  text-align:center;
-  font-weight:800;
-  box-shadow:0 8px 20px rgba(20,28,46,.12)
-}
-.activityMain{width:100%;max-width:1120px;margin:22px auto 0}
-.activityIntro{display:flex;align-items:flex-end;justify-content:space-between;gap:30px}
-.introCopy{min-width:0}
-.activityIntro h1{
-  margin:12px 0 10px;
-  color:#151d2f;
-  font-size:46px;
-  line-height:1.08;
-  letter-spacing:-1.2px;
-}
-.activityIntro h1 span{color:#3863ed}
-.activityIntro p{margin:0;max-width:780px;color:#68758b;font-size:16px;line-height:1.65}
-.activityProgress{
-  flex:0 0 92px;
-  padding:14px 12px;
-  border-radius:15px;
-  background:#141c2e;
-  color:#fff;
-  text-align:center;
-}
-.activityProgress b,.activityProgress small{display:block}
-.activityProgress b{font-size:21px}
-.activityProgress small{margin-top:3px;font-size:9px;color:#b9c1d1}
-.activityTrack{height:7px;margin:24px 0 20px;background:#e5e9f0;border-radius:99px;overflow:hidden}
-.activityTrack i{display:block;height:100%;min-width:0;background:#3863ed;border-radius:99px;transition:width .25s ease}
-.activityGrid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}
-.activityCard{
-  min-width:0;
-  background:#fff;
-  border:1px solid #e1e6ee;
-  border-radius:20px;
-  box-shadow:0 14px 35px rgba(23,32,51,.07)
-}
-.activityScenario{padding:28px}
-.scenarioIcon{
-  width:64px;height:64px;
-  display:grid;place-items:center;
-  margin-bottom:22px;
-  border-radius:18px;
-  background:#eef4ff;
-  font-size:34px
-}
-.activityScenario h2,.activityQuestion h2{margin:10px 0 14px;font-size:25px;line-height:1.25;letter-spacing:-.3px}
-.activityScenario>p{margin:0;color:#68758b;font-size:14px;line-height:1.7}
-.scenarioRule{margin-top:25px;padding:14px;border:1px solid #e4e9f1;border-radius:13px;background:#f7f9fd}
-.scenarioRule b,.scenarioRule span{display:block}
-.scenarioRule b{font-size:11px;color:#3863ed}
-.scenarioRule span{margin-top:5px;font-size:12px;color:#69768a}
-.activityQuestion{padding:28px}
-.questionMeta{display:flex;align-items:center;justify-content:space-between;gap:15px;color:#6b778d;font-size:12px;font-weight:800}
-.questionMeta span:last-child{color:#3863ed}
-.activityQuestion h2{margin-top:30px;font-size:27px}
-.activityOptions{display:grid;gap:11px;margin-top:24px}
-.activityOptions button{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:14px;
-  padding:14px 15px;
-  border:1px solid #dfe5ee;
-  border-radius:13px;
-  background:#fff;
-  color:#172033;
-  font:inherit;
-  font-size:14px;
-  line-height:1.4;
-  text-align:left;
-  cursor:pointer;
-  transition:border-color .18s,background .18s,transform .18s
-}
-.activityOptions button:hover:not(:disabled){border-color:#3863ed;background:#f5f8ff;transform:translateY(-1px)}
-.activityOptions button:disabled{cursor:default}
-.activityOptions button b{
-  flex:0 0 34px;
-  width:34px;height:34px;
-  display:grid;place-items:center;
-  border-radius:9px;
-  background:#eef2f7;
-  font-size:13px
-}
-.activityOptions button span{flex:1}
-.activityOptions button em{margin-left:auto;font-style:normal;font-size:18px;font-weight:900}
-.activityOptions button.correct{border-color:#9ad9b4;background:#f0fbf4}
-.activityOptions button.correct b{background:#dff7e8;color:#16824b}
-.activityOptions button.wrong{border-color:#f0a4a4;background:#fff5f5}
-.activityOptions button.wrong b{background:#fee2e2;color:#b91c1c}
-.activityFeedback{margin-top:16px;padding:14px;border-radius:13px}
-.activityFeedback.good{background:#eefbf2;border:1px solid #b8e6c7}
-.activityFeedback.bad{background:#fff5f5;border:1px solid #f1c2c2}
-.activityFeedback b{font-size:12px}
-.activityFeedback p{margin:5px 0 0;color:#68758b;font-size:11px;line-height:1.55}
-.activityActions{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:20px;color:#7a8799;font-size:11px;font-weight:700}
-.activityPrimary{
-  border:0;
-  border-radius:12px;
-  padding:13px 18px;
-  background:#3863ed;
-  color:#fff;
-  font:inherit;
-  font-size:13px;
-  font-weight:800;
-  box-shadow:0 8px 20px rgba(56,99,237,.18);
-  cursor:pointer
-}
-@media(max-width:850px){
-  .activityPage{padding:0 16px 40px}
-  .activityMain{margin-top:10px}
-  .activityIntro{align-items:flex-start}
-  .activityGrid{grid-template-columns:1fr}
-  .activityIntro h1{font-size:38px}
-}
-@media(max-width:600px){
-  .activityHeader{padding:16px 0}
-  .activityHeader strong{font-size:17px}
-  .activityScore{min-width:78px;padding:10px 12px;font-size:12px}
-  .activityIntro{display:block}
-  .activityProgress{display:inline-block;margin-top:16px}
-  .activityIntro h1{font-size:32px}
-  .activityScenario,.activityQuestion{padding:20px}
-  .activityActions{align-items:stretch;flex-direction:column}
-  .activityPrimary{width:100%}
-}
-`;
+
+const css=`*{box-sizing:border-box}.activityPage{min-height:100vh;width:100%;padding:0 28px 60px;background:radial-gradient(circle at 50% 0,#fff 0,#f3f6fb 65%);color:#172033;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.activityHeader{width:100%;max-width:1240px;margin:0 auto;padding:22px 0;display:flex;align-items:center;justify-content:space-between;gap:20px}.activityHeader strong{display:block;font-size:20px;margin-top:3px}.eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#71809a;text-transform:uppercase}.activityScore{min-width:92px;padding:11px 16px;border-radius:14px;background:#141c2e;color:#fff;text-align:center;font-weight:800}.activityMain{width:100%;max-width:1120px;margin:22px auto 0}.activityIntro{display:flex;align-items:flex-end;justify-content:space-between;gap:30px}.activityIntro h1{margin:12px 0 10px;color:#151d2f;font-size:46px;line-height:1.08}.activityIntro h1 span{color:#3863ed}.activityIntro p{margin:0;max-width:780px;color:#68758b;font-size:16px;line-height:1.65}.activityProgress{padding:14px 18px;border-radius:15px;background:#141c2e;color:#fff;text-align:center}.activityProgress b,.activityProgress small{display:block}.activityProgress small{margin-top:3px;font-size:9px;color:#b9c1d1}.activityTrack{height:7px;margin:24px 0 20px;background:#e5e9f0;border-radius:99px;overflow:hidden}.activityTrack i{display:block;height:100%;background:#3863ed;border-radius:99px}.activityGrid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:20px;align-items:start}.activityCard{min-width:0;background:#fff;border:1px solid #e1e6ee;border-radius:20px;box-shadow:0 14px 35px rgba(23,32,51,.07)}.activityScenario,.activityQuestion{padding:28px}.scenarioIcon{width:64px;height:64px;display:grid;place-items:center;margin-bottom:22px;border-radius:18px;background:#eef4ff;font-size:34px}.activityScenario h2,.activityQuestion h2{margin:10px 0 14px;font-size:25px;line-height:1.25}.activityScenario>p{margin:0;color:#68758b;font-size:14px;line-height:1.7}.scenarioRule{margin-top:25px;padding:14px;border:1px solid #e4e9f1;border-radius:13px;background:#f7f9fd}.scenarioRule b,.scenarioRule span{display:block}.scenarioRule b{font-size:11px;color:#3863ed}.scenarioRule span{margin-top:5px;font-size:12px;color:#69768a}.questionMeta{display:flex;justify-content:space-between;color:#6b778d;font-size:12px;font-weight:800}.questionMeta span:last-child{color:#3863ed}.activityQuestion h2{margin-top:30px;font-size:27px}.activityOptions{display:grid;gap:11px;margin-top:24px}.activityOptions button{width:100%;display:flex;align-items:center;gap:14px;padding:14px 15px;border:1px solid #dfe5ee;border-radius:13px;background:#fff;color:#172033;font:inherit;font-size:14px;text-align:left;cursor:pointer}.activityOptions button:hover:not(:disabled){border-color:#3863ed;background:#f5f8ff}.activityOptions button b{flex:0 0 34px;width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#eef2f7}.activityOptions button span{flex:1}.activityOptions button em{margin-left:auto;font-style:normal;font-size:18px;font-weight:900}.activityOptions button.correct{border-color:#9ad9b4;background:#f0fbf4}.activityOptions button.wrong{border-color:#f0a4a4;background:#fff5f5}.activityFeedback{margin-top:16px;padding:14px;border-radius:13px}.activityFeedback.good{background:#eefbf2;border:1px solid #b8e6c7}.activityFeedback.bad{background:#fff5f5;border:1px solid #f1c2c2}.activityFeedback p{font-size:11px;color:#68758b;line-height:1.55;margin:5px 0 0}.activityActions{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:20px;color:#7a8799;font-size:11px;font-weight:700}.activityPrimary{border:0;border-radius:12px;padding:13px 18px;background:#3863ed;color:#fff;font:inherit;font-size:13px;font-weight:800;cursor:pointer}@media(max-width:850px){.activityPage{padding:0 16px 40px}.activityGrid{grid-template-columns:1fr}.activityIntro h1{font-size:38px}}@media(max-width:600px){.activityIntro{display:block}.activityProgress{display:inline-block;margin-top:16px}.activityIntro h1{font-size:32px}.activityScenario,.activityQuestion{padding:20px}.activityActions{align-items:stretch;flex-direction:column}.activityPrimary{width:100%}}`;
