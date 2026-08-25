@@ -49,3 +49,7 @@ The platform is designed to support:
 **Connect the wires to turn ON the light**
 
 The simulation will model a simple electrical circuit with terminals, components, connection validation, circuit state, timing and automatic scoring.
+
+## Fourth practical activity
+
+**Electrical Circuit Assembly** lets the candidate pick and place a battery, ammeter, bulb, voltmeter and variable resistor onto a blank circuit board and connect the components without being given the circuit sequence. The submitted circuit is validated locally and contributes to the final performance score.
