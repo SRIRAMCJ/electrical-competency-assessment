@@ -1,0 +1,59 @@
+name: Add fourth circuit activity
+on:
+  push:
+    branches: [main]
+permissions:
+  contents: write
+jobs:
+  patch:
+    if: ${{ !startsWith(github.event.head_commit.message, 'chore: add fourth circuit activity') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Add activity component
+        run: |
+          cat > frontend/src/CircuitDrawingActivity.tsx <<'EOF'
+          import { useState } from 'react';
+          type Item='battery'|'ammeter'|'lamp'|'voltmeter'|'rheostat';
+          type Pos={x:number;y:number};
+          const items:Record<Item,{name:string;symbol:string}>={battery:{name:'Battery',symbol:'🔋'},ammeter:{name:'Ammeter',symbol:'A'},lamp:{name:'Bulb',symbol:'💡'},voltmeter:{name:'Voltmeter',symbol:'V'},rheostat:{name:'Variable resistor',symbol:'▱'}};
+          const target:Record<Item,Pos>={battery:{x:12,y:25},ammeter:{x:28,y:65},lamp:{x:52,y:65},voltmeter:{x:52,y:82},rheostat:{x:78,y:40}};
+          export default function CircuitDrawingActivity({onFinish}:{onFinish:(score:number)=>void}){
+            const [placed,setPlaced]=useState<Record<Item,Pos>>({});
+            const [selected,setSelected]=useState<Item|null>(null);
+            const [edges,setEdges]=useState<[Item,Item][]>([]);
+            const [drag,setDrag]=useState<Item|null>(null);
+            const place=(item:Item,e?:any)=>{if(e){e.preventDefault();const r=e.currentTarget.getBoundingClientRect();setPlaced(p=>({...p,[item]:{x:Math.max(6,Math.min(94,((e.clientX-r.left)/r.width)*100)),y:Math.max(10,Math.min(90,((e.clientY-r.top)/r.height)*100))}}));}else setPlaced(p=>({...p,[item]:target[item]}));};
+            const connect=(item:Item)=>{if(!placed[item])return;if(!selected){setSelected(item);return;}if(selected===item){setSelected(null);return;}const pair:[Item,Item]=[selected,item];if(!edges.some(([a,b])=>(a===pair[0]&&b===pair[1])||(a===pair[1]&&b===pair[0]))){setEdges(e=>[...e,pair]);}setSelected(null);};
+            const complete=Object.keys(items).every(k=>placed[k as Item]) && edges.length>=5;
+            return <div className="drawActivity"><style>{` .drawActivity{max-width:1220px;margin:0 auto;padding:25px 0 50px;color:#172033}.drawHead{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:20px}.drawHead h1{font-size:40px;margin:8px 0}.drawHead span{color:#3863ed}.drawHead p{margin:0;color:#7a879a}.drawBody{display:grid;grid-template-columns:250px 1fr;gap:18px}.drawTray,.drawBoard{background:#fff;border:1px solid #e0e6ee;border-radius:20px}.drawTray{padding:18px}.drawTray h3{margin:0 0 8px}.drawTray p{font-size:12px;color:#8290a4;line-height:1.5}.drawItem{display:flex;align-items:center;gap:10px;width:100%;margin:9px 0;padding:12px;border:1px solid #dfe5ee;background:#fff;border-radius:12px;text-align:left;font-weight:800}.drawItem span{width:36px;height:36px;border-radius:10px;background:#f4f6f9;display:grid;place-items:center;font-size:20px}.drawItem small{display:block;color:#8793a5;font-weight:500}.drawBoard{padding:18px}.drawCanvas{position:relative;min-height:620px;border-radius:16px;background:#fff;border:1px solid #d7dce4;overflow:hidden}.drawGrid{position:absolute;inset:0;background-image:radial-gradient(#dce1e8 1px,transparent 1px);background-size:22px 22px}.part{position:absolute;transform:translate(-50%,-50%);z-index:5;width:90px;height:64px;border:2px solid #242a33;border-radius:12px;background:#fff;display:grid;place-items:center;font-weight:900;box-shadow:0 5px 12px #17203316}.part.lamp{width:78px;height:78px;border-radius:50%}.part.meter{border-radius:50%;width:76px;height:76px}.part.battery{width:100px}.part small{font-size:8px;color:#7c8797}.wireLayer{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}.wireLine{stroke:#20242b;stroke-width:5;fill:none;stroke-linecap:round}.selectedPart{border-color:#3863ed;box-shadow:0 0 0 4px #dbe7ff}.trayHint{margin-top:12px;padding:10px;background:#f7f9fc;border-radius:10px;font-size:11px;color:#7c899c}.drawFooter{display:flex;justify-content:space-between;align-items:center;margin-top:15px}.drawMessage{color:#6f7c90;font-size:12px}.drawFinish{border:0;border-radius:11px;padding:12px 18px;background:#3863ed;color:#fff;font-weight:900}.drawFinish:disabled{opacity:.4}@media(max-width:800px){.drawBody{grid-template-columns:1fr}.drawCanvas{min-height:520px}.drawHead{display:block}.drawHead h1{font-size:32px}}`}</style>
+              <div className="drawHead"><div><div className="eyebrow">STAGE 4 • PRACTICAL ASSEMBLY</div><h1>Assemble the <span>Electrical Circuit</span></h1><p>Place the components and connect them to reproduce the circuit.</p></div><div className="counter"><b>{edges.length}/5</b><small>connections</small></div></div>
+              <div className="drawBody"><aside className="drawTray"><h3>Components</h3><p>Pick a component and place it on the circuit board.</p>{(Object.keys(items) as Item[]).map(i=><button key={i} className="drawItem" draggable onDragStart={()=>setDrag(i)} onClick={()=>place(i)}><span>{items[i].symbol}</span><div>{items[i].name}<small>{placed[i]?'Placed':'Pick & place'}</small></div></button>)}<div className="trayHint">Click two placed components to create a connection.</div></aside><section className="drawBoard"><div className="drawCanvas" onDragOver={e=>e.preventDefault()} onDrop={e=>{if(drag){place(drag,e);setDrag(null)}}}><div className="drawGrid"/>{edges.map(([a,b],i)=>{const p=placed[a],q=placed[b];return p&&q?<svg key={i} className="wireLayer" viewBox="0 0 100 100" preserveAspectRatio="none"><line className="wireLine" x1={p.x} y1={p.y} x2={q.x} y2={q.y}/></svg>:null})}{(Object.keys(items) as Item[]).map(i=>{const p=placed[i];return p?<button key={i} className={`part ${i==='lamp'?'lamp':''} ${i==='ammeter'||i==='voltmeter'?'meter':''} ${i==='battery'?'battery':''} ${selected===i?'selectedPart':''}`} style={{left:`${p.x}%`,top:`${p.y}%`}} onClick={()=>connect(i)}>{items[i].symbol}<small>{items[i].name}</small></button>:null})}</div><div className="drawFooter"><span className="drawMessage">{complete?'Circuit complete — submit the assembly.':''}</span><button className="drawFinish" disabled={!complete} onClick={()=>onFinish(20)}>Finish activity →</button></div></section></div>
+            </div>;
+          }
+          EOF
+      - name: Patch App
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p=Path('frontend/src/App.tsx')
+          s=p.read_text()
+          s=s.replace("import InteractiveActivity from './InteractiveActivity';", "import InteractiveActivity from './InteractiveActivity';\nimport CircuitDrawingActivity from './CircuitDrawingActivity';")
+          s=s.replace("'quiz'|'activity'|'practical'|'result'", "'quiz'|'activity'|'practical'|'drawing'|'result'")
+          s=s.replace("const[activityScore,setActivityScore]=useState(0);", "const[activityScore,setActivityScore]=useState(0);\n const[drawingScore,setDrawingScore]=useState(0);")
+          s=s.replace("setActivityScore(0);setAnswers({});", "setActivityScore(0);setDrawingScore(0);setAnswers({});")
+          s=s.replace("if(stage==='result')return <Result knowledge={knowledge} practical={practical} total={total} percentage={percentage} onReset={reset}/>;", "if(stage==='drawing')return <Shell><Header title=\"Final Practical Assembly\"/><CircuitDrawingActivity onFinish={(score)=>{setDrawingScore(score);setStage('result')}}/></Shell>;\n if(stage==='result')return <Result knowledge={knowledge} practical={practical} drawing={drawingScore} total={knowledge+practical+drawingScore} percentage={Math.round((knowledge+practical+drawingScore)/90*100)} onReset={reset}/>;")
+          s=s.replace("onFinish:()=>setStage('result')", "onFinish:()=>setStage('drawing')")
+          s=s.replace("function Result({knowledge,practical,total,percentage,onReset}", "function Result({knowledge,practical,drawing,total,percentage,onReset}")
+          s=s.replace("<div><small>Total</small><b>{total}/70</b></div>", "<div><small>Final assembly</small><b>{drawing}/20</b></div><div><small>Total</small><b>{total}/90</b></div>")
+          s=s.replace("grid-template-columns:repeat(3,1fr)", "grid-template-columns:repeat(4,1fr)")
+          s=s.replace("<p>{level==='Advanced'?'Strong electrical fundamentals, troubleshooting and practical assembly performance.':'Use the breakdown to identify areas for further technical training.'}</p>", "<p>{level==='Advanced'?'Strong electrical fundamentals, troubleshooting, practical wiring and circuit assembly performance.':drawing<15?'The employee should receive additional circuit assembly practice before independent work.':'Use the breakdown to identify areas for further technical training.'}</p>")
+          p.write_text(s)
+          PY
+      - name: Commit patch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add frontend/src/App.tsx frontend/src/CircuitDrawingActivity.tsx
+          git commit -m "chore: add fourth circuit activity" || exit 0
+          git push
