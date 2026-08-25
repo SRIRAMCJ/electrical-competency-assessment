@@ -1,51 +1,185 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-type Activity='mcq'|'multi'|'fill'|'match'|'order'|'identify'|'scenario'|'typing'|'timed'|'circuit';
-type Q={id:string;type:Activity;title:string;prompt:string;options?:string[];answer?:string|string[];points:number};
-type Terminal='battery_plus'|'battery_minus'|'lamp_plus'|'lamp_minus'|'switch_in'|'switch_out';
+type Question = {
+  id: string;
+  question: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+  points: number;
+};
 
-const questions:Q[]=[
-{id:'q1',type:'mcq',title:'MCQ',prompt:'What is the SI unit of electrical resistance?',options:['Volt','Ampere','Ohm','Watt'],answer:'Ohm',points:5},
-{id:'q2',type:'multi',title:'Multiple choice',prompt:'Which are electrical quantities measured with a multimeter?',options:['Voltage','Current','Resistance','Paint thickness'],answer:['Voltage','Current','Resistance'],points:5},
-{id:'q3',type:'fill',title:'Fill in the blank',prompt:'Electrical power is measured in ______.',answer:'watts',points:5},
-{id:'q4',type:'match',title:'Match the following',prompt:'Select all four correct component → function matches.',options:['Fuse → Overcurrent protection','Transformer → Changes AC voltage level','Relay → Electrically operated switching','VFD → Controls motor speed'],answer:['Fuse → Overcurrent protection','Transformer → Changes AC voltage level','Relay → Electrically operated switching','VFD → Controls motor speed'],points:10},
-{id:'q5',type:'order',title:'Order / arrange',prompt:'Arrange the basic electrical isolation sequence from first to last.',options:['Verify zero energy','Identify the equipment','Isolate the supply','Apply lockout/tagout'],answer:['Identify the equipment','Isolate the supply','Apply lockout/tagout','Verify zero energy'],points:10},
-{id:'q6',type:'identify',title:'Image identification',prompt:'Which component is normally used to protect a circuit from excessive current?',options:['Fuse','Lamp','Potentiometer','Capacitor'],answer:'Fuse',points:5},
-{id:'q7',type:'scenario',title:'Scenario',prompt:'A three-phase motor suddenly stops. The overload relay shows TRIP. What should you do first?',options:['Increase the overload setting immediately','Follow the safe isolation procedure and investigate the cause','Bypass the overload','Replace the motor without testing'],answer:'Follow the safe isolation procedure and investigate the cause',points:10},
-{id:'q8',type:'typing',title:'Typing / input',prompt:'Enter the standard nominal three-phase industrial supply voltage commonly used in India (numeric value only).',answer:'415',points:5},
-{id:'q9',type:'timed',title:'Timed challenge',prompt:'Select every item that can present an electrical safety hazard.',options:['Exposed conductor','Damaged insulation','Properly closed panel','Wet hands','Missing earthing'],answer:['Exposed conductor','Damaged insulation','Wet hands','Missing earthing'],points:10},
-{id:'q10',type:'circuit',title:'Interactive simulation',prompt:'Connect the wires correctly and close the switch to turn ON the lamp.',points:20}
+const questions: Question[] = [
+  { id: 'EL-MCQ-001', question: 'What is the SI unit of electrical current?', options: ['Volt', 'Ampere', 'Ohm', 'Watt'], answer: 'Ampere', explanation: 'Ampere (A) is the SI unit of electric current.', points: 1 },
+  { id: 'EL-MCQ-002', question: 'Which instrument is used to measure electrical current?', options: ['Voltmeter', 'Ammeter', 'Ohmmeter', 'Wattmeter'], answer: 'Ammeter', explanation: 'An ammeter is used to measure electrical current.', points: 1 },
+  { id: 'EL-MCQ-003', question: 'According to Ohm’s law, which equation is correct?', options: ['V = I × R', 'P = V × I', 'R = V × I', 'I = V × R'], answer: 'V = I × R', explanation: 'Ohm’s law states that voltage equals current multiplied by resistance.', points: 1 },
+  { id: 'EL-MCQ-004', question: 'What is the SI unit of electrical resistance?', options: ['Ampere', 'Volt', 'Ohm', 'Watt'], answer: 'Ohm', explanation: 'Ohm (Ω) is the SI unit of electrical resistance.', points: 1 },
+  { id: 'EL-MCQ-005', question: 'What is the primary purpose of a fuse?', options: ['Increase voltage', 'Protect against excessive current', 'Store electrical energy', 'Measure current'], answer: 'Protect against excessive current', explanation: 'A fuse protects a circuit by opening the circuit when excessive current flows.', points: 1 },
+  { id: 'EL-MCQ-006', question: 'What happens to total resistance when resistors are connected in series?', options: ['It is the sum of the resistances', 'It becomes zero', 'It equals the smallest resistor', 'It equals the largest resistor'], answer: 'It is the sum of the resistances', explanation: 'For series resistors, total resistance is R₁ + R₂ + R₃ and so on.', points: 1 },
+  { id: 'EL-MCQ-007', question: 'Which type of current periodically changes direction?', options: ['Direct current', 'Alternating current', 'Static current', 'Leakage current'], answer: 'Alternating current', explanation: 'Alternating current (AC) periodically reverses direction.', points: 1 },
+  { id: 'EL-MCQ-008', question: 'What is the SI unit of electrical power?', options: ['Watt', 'Ohm', 'Coulomb', 'Ampere'], answer: 'Watt', explanation: 'Watt (W) is the SI unit of power.', points: 1 },
+  { id: 'EL-MCQ-009', question: 'In an ideal parallel circuit, what is common across each branch?', options: ['Voltage', 'Resistance', 'Power', 'Energy'], answer: 'Voltage', explanation: 'Parallel branches are connected across the same two nodes, so their voltage is the same.', points: 1 },
+  { id: 'EL-MCQ-010', question: 'Which device is commonly used to open or close an electrical circuit?', options: ['Transformer', 'Switch', 'Resistor', 'Capacitor'], answer: 'Switch', explanation: 'A switch is designed to open or close an electrical circuit.', points: 1 },
 ];
-const names:Record<Activity,string>={mcq:'MCQ',multi:'Multiple choice',fill:'Fill in the blank',match:'Match the following',order:'Order / arrange',identify:'Image identification',scenario:'Scenario',typing:'Typing / input',timed:'Timed challenge',circuit:'Interactive simulation'};
-const correctPairs=new Set(['battery_plus|lamp_plus','lamp_minus|switch_in','switch_out|battery_minus']);
-const pairKey=(a:Terminal,b:Terminal)=>{const x=`${a}|${b}`,y=`${b}|${a}`;return correctPairs.has(x)?x:y};
 
-export default function App(){
- const[index,setIndex]=useState(0),[answers,setAnswers]=useState<Record<string,string|string[]>>({}),[started,setStarted]=useState(false),[finished,setFinished]=useState(false),[remaining,setRemaining]=useState(300),[connections,setConnections]=useState<[Terminal,Terminal][]>([]),[selected,setSelected]=useState<Terminal|null>(null),[closed,setClosed]=useState(false);
- const q=questions[index];
- useEffect(()=>{if(!started||finished)return;const id=setInterval(()=>setRemaining(v=>Math.max(0,v-1)),1000);return()=>clearInterval(id)},[started,finished]);
- const circuitDone=closed&&connections.length===3&&connections.every(([a,b])=>correctPairs.has(pairKey(a,b)));
- const scored=useMemo(()=>{let s=questions.reduce((n,x)=>n+grade(x,answers[x.id]),0);if(circuitDone)s+=20;return s},[answers,circuitDone]);
- const max=90;
- const choose=(v:string)=>setAnswers(a=>({...a,[q.id]:v}));
- const toggle=(v:string)=>setAnswers(a=>{const old=Array.isArray(a[q.id])?a[q.id] as string[]:[];return {...a,[q.id]:old.includes(v)?old.filter(x=>x!==v):[...old,v]}});
- const selectTerminal=(t:Terminal)=>{if(!selected){setSelected(t);return}if(selected!==t&&!connections.some(([a,b])=>(a===selected&&b===t)||(a===t&&b===selected)))setConnections(v=>[...v,[selected,t]]);setSelected(null)};
- const next=()=>{if(index<questions.length-1){setIndex(i=>i+1);return}setFinished(true)};
- const reset=()=>{setIndex(0);setAnswers({});setStarted(false);setFinished(false);setRemaining(300);setConnections([]);setSelected(null);setClosed(false)};
- if(!started)return <Start onStart={()=>setStarted(true)}/>;
- if(finished||remaining===0)return <Result score={scored} max={max} attempted={Object.keys(answers).length+(circuitDone?1:0)} reset={reset}/>;
- return <div className="app"><header className="top"><div><div className="eyebrow">ELECTRICAL • NEW ENTRY WORKER</div><h2>Competency Assessment</h2></div><div className="timer"><small>TIME REMAINING</small><b>{String(Math.floor(remaining/60)).padStart(2,'0')}:{String(remaining%60).padStart(2,'0')}</b></div></header><div className="progress"><span style={{width:`${((index+1)/questions.length)*100}%`}}/></div><main className="layout"><section className="question"><div className="qmeta"><span>{index+1} / {questions.length}</span><span>{names[q.type]}</span><strong>{q.points} pts</strong></div><h1>{q.prompt}</h1><ActivityView q={q} value={answers[q.id]} choose={choose} toggle={toggle} connections={connections} selected={selected} selectTerminal={selectTerminal} closed={closed} setClosed={setClosed} circuitDone={circuitDone}/><div className="nav"><button disabled={index===0} onClick={()=>setIndex(i=>i-1)}>← Previous</button><button className="primary" onClick={next}>{index===questions.length-1?'Submit assessment':'Next activity →'}</button></div></section><aside><div className="sidecard"><b>Activities</b>{questions.map((x,i)=><button key={x.id} className={i===index?'active':''} onClick={()=>setIndex(i)}><span>{i+1}</span>{x.title}<em>{x.type==='circuit'?circuitDone:answers[x.id]?'✓':''}</em></button>)}</div><div className="sidecard tip"><b>Assessment rules</b><p>Complete the activities carefully. The final report combines knowledge, safety, practical reasoning and interactive performance.</p></div></aside></main></div>
+export default function App() {
+  const [started, setStarted] = useState(false);
+  const [finished, setFinished] = useState(false);
+  const [index, setIndex] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [remaining, setRemaining] = useState(10 * 60);
+
+  useEffect(() => {
+    if (!started || finished) return;
+    const timer = window.setInterval(() => {
+      setRemaining((value) => {
+        if (value <= 1) {
+          setFinished(true);
+          return 0;
+        }
+        return value - 1;
+      });
+    }, 1000);
+    return () => window.clearInterval(timer);
+  }, [started, finished]);
+
+  const question = questions[index];
+  const score = questions.reduce((total, item) => total + (answers[item.id] === item.answer ? item.points : 0), 0);
+  const maxScore = questions.reduce((total, item) => total + item.points, 0);
+  const percentage = Math.round((score / maxScore) * 100);
+
+  const selectAnswer = (answer: string) => {
+    setAnswers((current) => ({ ...current, [question.id]: answer }));
+  };
+
+  const reset = () => {
+    setStarted(false);
+    setFinished(false);
+    setIndex(0);
+    setAnswers({});
+    setRemaining(10 * 60);
+  };
+
+  if (!started) return <Start onStart={() => setStarted(true)} />;
+  if (finished) return <Result score={score} maxScore={maxScore} percentage={percentage} answers={answers} reset={reset} />;
+
+  const answered = Boolean(answers[question.id]);
+  const progress = ((index + 1) / questions.length) * 100;
+  const minutes = Math.floor(remaining / 60).toString().padStart(2, '0');
+  const seconds = (remaining % 60).toString().padStart(2, '0');
+
+  return (
+    <div className="app">
+      <header className="top">
+        <div>
+          <div className="eyebrow">ELECTRICAL • NEW ENTRY WORKER</div>
+          <h2>Electrical Competency Quiz</h2>
+        </div>
+        <div className="timer">
+          <small>TIME REMAINING</small>
+          <b>{minutes}:{seconds}</b>
+        </div>
+      </header>
+
+      <div className="progress"><span style={{ width: `${progress}%` }} /></div>
+
+      <main className="layout">
+        <section className="question">
+          <div className="qmeta">
+            <span>Question {index + 1} / {questions.length}</span>
+            <span>MCQ</span>
+            <strong>{question.points} point</strong>
+          </div>
+
+          <h1>{question.question}</h1>
+
+          <div className="options">
+            {question.options.map((option, optionIndex) => (
+              <button
+                key={option}
+                className={answers[question.id] === option ? 'selected' : ''}
+                onClick={() => selectAnswer(option)}
+              >
+                <i>{String.fromCharCode(65 + optionIndex)}</i>
+                {option}
+              </button>
+            ))}
+          </div>
+
+          <div className="nav">
+            <button disabled={index === 0} onClick={() => setIndex((value) => value - 1)}>← Previous</button>
+            <button
+              className="primary"
+              disabled={!answered}
+              onClick={() => index === questions.length - 1 ? setFinished(true) : setIndex((value) => value + 1)}
+            >
+              {index === questions.length - 1 ? 'Submit quiz' : 'Next question →'}
+            </button>
+          </div>
+        </section>
+
+        <aside>
+          <div className="sidecard">
+            <b>Quiz Questions</b>
+            {questions.map((item, itemIndex) => (
+              <button key={item.id} className={itemIndex === index ? 'active' : ''} onClick={() => setIndex(itemIndex)}>
+                <span>{itemIndex + 1}</span>
+                Electrical MCQ
+                <em>{answers[item.id] ? '✓' : ''}</em>
+              </button>
+            ))}
+          </div>
+          <div className="sidecard tip">
+            <b>Assessment rules</b>
+            <p>Select one answer for each question. Your score and performance summary are calculated automatically when you submit.</p>
+          </div>
+        </aside>
+      </main>
+    </div>
+  );
 }
-function Start({onStart}:{onStart:()=>void}){return <div className="start"><div className="startcard"><div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div><h1>Electrical Skills<br/><span>Practical Assessment</span></h1><p>Interactive competency assessment covering fundamentals, safety, troubleshooting and practical circuit logic.</p><div className="stats"><div><b>10</b><small>activities</small></div><div><b>90</b><small>points</small></div><div><b>5:00</b><small>time limit</small></div></div><button className="primary big" onClick={onStart}>Start assessment →</button><small className="offline">● Runs locally in the browser • no API required</small></div></div>}
-function ActivityView({q,value,choose,toggle,connections,selected,selectTerminal,closed,setClosed,circuitDone}:{q:Q;value:string|string[]|undefined;choose:(v:string)=>void;toggle:(v:string)=>void;connections:[Terminal,Terminal][];selected:Terminal|null;selectTerminal:(t:Terminal)=>void;closed:boolean;setClosed:(v:boolean)=>void;circuitDone:boolean}){
- if(q.type==='circuit')return <Circuit connections={connections} selected={selected} selectTerminal={selectTerminal} closed={closed} setClosed={setClosed} done={circuitDone}/>;
- if(q.type==='fill'||q.type==='typing')return <input className="textinput" value={typeof value==='string'?value:''} onChange={e=>choose(e.target.value)} placeholder="Type your answer…"/>;
- if(q.type==='multi'||q.type==='timed'||q.type==='match')return <div className="options">{q.options?.map(o=><button key={o} className={Array.isArray(value)&&value.includes(o)?'selected':''} onClick={()=>toggle(o)}><i>✓</i>{o}</button>)}</div>;
- if(q.type==='order')return <Order value={Array.isArray(value)?value:[]} options={q.options||[]} choose={choose}/>;
- if(q.type==='identify')return <><div className="symbol"><div className="fuse">—[ FUSE ]—</div><small>Typical protective component</small></div><div className="options">{q.options?.map(o=><button key={o} className={value===o?'selected':''} onClick={()=>choose(o)}><i>○</i>{o}</button>)}</div></>;
- return <div className="options">{q.options?.map(o=><button key={o} className={value===o?'selected':''} onClick={()=>choose(o)}><i>○</i>{o}</button>)}</div>;
+
+function Start({ onStart }: { onStart: () => void }) {
+  return (
+    <div className="start">
+      <div className="startcard">
+        <div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div>
+        <h1>Electrical Fundamentals<br /><span>MCQ Quiz</span></h1>
+        <p>Test your basic electrical knowledge with a focused multiple-choice assessment for new entry workers.</p>
+        <div className="stats">
+          <div><b>10</b><small>questions</small></div>
+          <div><b>10</b><small>points</small></div>
+          <div><b>10:00</b><small>time limit</small></div>
+        </div>
+        <button className="primary big" onClick={onStart}>Start quiz →</button>
+        <small className="offline">● Runs locally in the browser • no API required</small>
+      </div>
+    </div>
+  );
 }
-function Order({value,options,choose}:{value:string[];options:string[];choose:(v:string)=>void}){const add=(o:string)=>{if(!value.includes(o))choose([...value,o] as unknown as string)};const remove=(o:string)=>choose(value.filter(x=>x!==o) as unknown as string);return <div className="order"><p>Click items in the correct order:</p>{options.map(o=><button key={o} className={value.includes(o)?'used':''} onClick={()=>add(o)}>{value.indexOf(o)+1||''} {o}</button>)}{value.length>0&&<div className="sequence"><b>Your sequence</b>{value.map((o,i)=><button key={o} onClick={()=>remove(o)}>{i+1}. {o} ×</button>)}</div>}</div>}
-function Circuit({connections,selected,selectTerminal,closed,setClosed,done}:{connections:[Terminal,Terminal][];selected:Terminal|null;selectTerminal:(t:Terminal)=>void;closed:boolean;setClosed:(v:boolean)=>void;done:boolean}){const pos:Record<Terminal,[number,number]>={battery_plus:[115,75],battery_minus:[115,285],lamp_plus:[430,75],lamp_minus:[430,285],switch_in:[750,75],switch_out:[750,285]};const labels:Record<Terminal,string>={battery_plus:'BATTERY +',battery_minus:'BATTERY −',lamp_plus:'LAMP +',lamp_minus:'LAMP −',switch_in:'SWITCH IN',switch_out:'SWITCH OUT'};return <div className="circuit"><div className="circuitboard"><svg viewBox="0 0 860 360">{connections.map(([a,b],i)=><line key={i} x1={pos[a][0]} y1={pos[a][1]} x2={pos[b][0]} y2={pos[b][1]} className="wire"/> )}</svg><div className="device battery"><b>BATTERY</b><div className="batteryicon">+ ┃┃┃ −</div><button className={`node ${selected==='battery_plus'?'sel':''}`} onClick={()=>selectTerminal('battery_plus')}>+</button><button className={`node bottom ${selected==='battery_minus'?'sel':''}`} onClick={()=>selectTerminal('battery_minus')}>−</button></div><div className={`device lamp ${done?'lit':''}`}><b>LAMP</b><div className="bulb">{done?'💡':'○'}</div><button className={`node ${selected==='lamp_plus'?'sel':''}`} onClick={()=>selectTerminal('lamp_plus')}>+</button><button className={`node bottom ${selected==='lamp_minus'?'sel':''}`} onClick={()=>selectTerminal('lamp_minus')}>−</button></div><div className="device switchdevice"><b>SWITCH</b><button className={`bigSwitch ${closed?'closed':''}`} onClick={()=>setClosed(!closed)}><i/><em/></button><small>{closed?'CLOSED':'OPEN'}</small><button className={`node ${selected==='switch_in'?'sel':''}`} onClick={()=>selectTerminal('switch_in')}>IN</button><button className={`node bottom ${selected==='switch_out'?'sel':''}`} onClick={()=>selectTerminal('switch_out')}>OUT</button></div></div><div className="circuithelp"><b>{selected?`Selected: ${labels[selected]}`:'Connect a terminal to another terminal'}</b><span>{done?'✓ Correct circuit — lamp ON':'Target: Battery + → Lamp + → Lamp − → Switch → Battery −'}</span></div></div>}
-function grade(q:Q,v:string|string[]|undefined){if(v===undefined)return 0;if(Array.isArray(q.answer)){const a=Array.isArray(v)?v:[];return JSON.stringify([...a].sort())===JSON.stringify([...q.answer].sort())?q.points:0}if(q.type==='fill'||q.type==='typing')return typeof v==='string'&&v.trim().toLowerCase()===q.answer?.toString().toLowerCase()?q.points:0;return v===q.answer?q.points:0}
-function Result({score,max,attempted,reset}:{score:number;max:number;attempted:number;reset:()=>void}){const pct=Math.round(score/max*100);const level=pct>=85?'Advanced':pct>=70?'Proficient':pct>=50?'Developing':'Needs Training';return <div className="resultpage"><div className="resultcard"><div className="eyebrow">ASSESSMENT COMPLETE</div><h1>Your Electrical<br/><span>Competency Report</span></h1><div className="score"><b>{pct}%</b><small>{score} / {max} points</small></div><div className="resultgrid"><div><b>Accuracy</b><strong>{pct}%</strong></div><div><b>Activities</b><strong>{attempted} / 10</strong></div><div><b>Competency level</b><strong>{level}</strong></div></div><div className="summary"><h3>Performance summary</h3><p>{pct>=85?'Strong performance. The candidate demonstrates a solid electrical foundation and good practical reasoning.':pct>=70?'Good foundation. The candidate can progress with targeted practical training in weaker areas.':pct>=50?'Developing competency. Additional supervised practice and safety training are recommended.':'Needs training. Do not rely on this assessment alone for authorization to perform electrical work.'}</p><div className="chips"><span>Electrical fundamentals</span><span>Safety awareness</span><span>Practical reasoning</span><span>Interactive task</span></div></div><button className="primary big" onClick={reset}>Retake assessment</button></div></div>}
+
+function Result({ score, maxScore, percentage, answers, reset }: { score: number; maxScore: number; percentage: number; answers: Record<string, string>; reset: () => void }) {
+  const level = percentage >= 85 ? 'Advanced' : percentage >= 70 ? 'Proficient' : percentage >= 50 ? 'Developing' : 'Needs Training';
+  const attempted = Object.keys(answers).length;
+
+  return (
+    <div className="resultpage">
+      <div className="resultcard">
+        <div className="eyebrow">QUIZ COMPLETE</div>
+        <h1>Your Electrical<br /><span>Quiz Result</span></h1>
+        <div className="score"><b>{percentage}%</b><small>{score} / {maxScore} points</small></div>
+        <div className="resultgrid">
+          <div><b>Correct answers</b><strong>{score} / {maxScore}</strong></div>
+          <div><b>Attempted</b><strong>{attempted} / 10</strong></div>
+          <div><b>Competency level</b><strong>{level}</strong></div>
+        </div>
+        <div className="summary">
+          <h3>Performance summary</h3>
+          <p>{percentage >= 85 ? 'Excellent foundation in electrical fundamentals. The candidate is ready for more advanced technical assessment.' : percentage >= 70 ? 'Good electrical foundation. Continue with practical and equipment-specific assessment.' : percentage >= 50 ? 'Developing foundation. Additional electrical fundamentals training is recommended.' : 'The candidate needs additional electrical fundamentals training before progressing to advanced assessment.'}</p>
+          <div className="chips"><span>Electrical fundamentals</span><span>MCQ knowledge</span><span>Automatic scoring</span></div>
+        </div>
+        <button className="primary big" onClick={reset}>Retake quiz</button>
+      </div>
+    </div>
+  );
+}
