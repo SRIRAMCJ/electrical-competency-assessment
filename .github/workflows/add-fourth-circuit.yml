@@ -6,7 +6,7 @@ permissions:
   contents: write
 jobs:
   patch:
-    if: ${{ !startsWith(github.event.head_commit.message, 'chore: add fourth circuit activity') }}
+    if: ${{ github.event.head_commit.message != 'chore: add fourth circuit activity' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
