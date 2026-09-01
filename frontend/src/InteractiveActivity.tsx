@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
-const ASSET_BASE = 'https://raw.githubusercontent.com/SRIRAMCJ/electrical-competency-assessment/main/';
+const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/';
 const ASSETS = {
   bulb: ASSET_BASE + 'BULB.fbx',
   battery: ASSET_BASE + 'battery.fbx',
@@ -82,6 +83,15 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6)); renderer.setSize(host.clientWidth, host.clientHeight); renderer.outputColorSpace = THREE.SRGBColorSpace; renderer.shadowMap.enabled = true; host.appendChild(renderer.domElement);
     const controls = new OrbitControls(camera, renderer.domElement); controls.enableDamping = true; controls.target.set(0, .25, 0); controls.minDistance = 3.5; controls.maxDistance = 14; controls.maxPolarAngle = Math.PI * .49;
+    let dragControls: DragControls | null = null;
+    const draggable: THREE.Object3D[] = [];
+    const enablePartDragging = () => {
+      if (!draggable.length) return;
+      dragControls = new DragControls(draggable, camera, renderer.domElement);
+      dragControls.transformGroup = false;
+      dragControls.addEventListener('dragstart', () => { controls.enabled = false; });
+      dragControls.addEventListener('dragend', () => { controls.enabled = true; });
+    };
     scene.add(new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 2)); const sun = new THREE.DirectionalLight(0xffffff, 2.8); sun.position.set(5, 9, 6); sun.castShadow = true; scene.add(sun);
     const floor = new THREE.Mesh(new THREE.BoxGeometry(16, .2, 10), mat(0xe7ebf0, { roughness: .9 })); floor.position.y = -1.05; floor.receiveShadow = true; scene.add(floor);
 
@@ -100,24 +110,24 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         ];
         for (const item of items) {
           if (item.url) {
-            try { const g = await loadFBX(item.url); fitObject(g, 2.1); g.position.x += item.x; g.position.y = 0; g.userData.toolKey = item.key; scene.add(g); }
+            try { const g = await loadFBX(item.url); fitObject(g, 2.1); g.position.x += item.x; g.position.y = 0; g.userData.toolKey = item.key; scene.add(g); draggable.push(g); }
             catch (err) { setNotice(`Unable to load ${item.key}. The 3D asset request failed.`); }
           } else {
             const g = item.key === 'soldering' ? (() => { const s = new THREE.Group(); const h = new THREE.Mesh(new THREE.CylinderGeometry(.16, .2, 1.35, 20), mat(0x374151)); h.rotation.z = Math.PI / 2; s.add(h); const tip = new THREE.Mesh(new THREE.CylinderGeometry(.045, .08, .7, 16), mat(0xcbd5e1, { metalness: .7 })); tip.rotation.z = Math.PI / 2; tip.position.x = .95; s.add(tip); return s; })() : (() => { const d = new THREE.Group(); d.add(box(1.15, .55, .55, mat(0x475569))); const grip = box(.28, .85, .35, mat(0x334155)); grip.position.set(-.15, -.45, 0); grip.rotation.z = -.12; d.add(grip); const ch = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .35, 18), mat(0x94a3b8, { metalness: .7 })); ch.rotation.z = Math.PI / 2; ch.position.x = .75; d.add(ch); return d; })();
-            g.position.set(item.x, 0, 0); g.userData.toolKey = item.key; setShadows(g); scene.add(g);
+            g.position.set(item.x, 0, 0); g.userData.toolKey = item.key; setShadows(g); scene.add(g); draggable.push(g);
           }
         }
       } else {
-        const battery = await loadFBX(ASSETS.battery); fitObject(battery, 2.2); battery.position.set(-3.6, 0, 0); scene.add(battery);
-        const bulb = await loadFBX(ASSETS.bulb); fitObject(bulb, 2.15); bulb.position.set(3.2, 0, 0); scene.add(bulb);
-        const sw = createSwitch(); sw.position.set(-.25, 0, 0); setShadows(sw); scene.add(sw);
+        const battery = await loadFBX(ASSETS.battery); fitObject(battery, 2.2); battery.position.set(-3.6, 0, 0); scene.add(battery); draggable.push(battery);
+        const bulb = await loadFBX(ASSETS.bulb); fitObject(bulb, 2.15); bulb.position.set(3.2, 0, 0); scene.add(bulb); draggable.push(bulb);
+        const sw = createSwitch(); sw.position.set(-.25, 0, 0); setShadows(sw); scene.add(sw); draggable.push(sw);
         if (round === 1) {
           const fuse = createFuse(); fuse.position.set(-2.05, 0, .05); setShadows(fuse); scene.add(fuse);
           const shield = fuse.getObjectByName('shield'); if (shield) shield.visible = !fuseOpen;
           const filament = fuse.getObjectByName('filament'); const a = fuse.getObjectByName('meltA'); const b = fuse.getObjectByName('meltB');
           if (filament) filament.visible = fuseOpen; if (a) a.visible = fuseOpen; if (b) b.visible = fuseOpen;
           if (filament) filament.scale.x = .5;
-          fuse.userData.isFuse = true;
+          fuse.userData.isFuse = true; draggable.push(fuse);
           const ray = new THREE.Raycaster(); const pointer = new THREE.Vector2();
           const onClick = (e: MouseEvent) => { const r = renderer.domElement.getBoundingClientRect(); pointer.x = ((e.clientX-r.left)/r.width)*2-1; pointer.y = -((e.clientY-r.top)/r.height)*2+1; ray.setFromCamera(pointer, camera); const hit = ray.intersectObject(fuse, true)[0]; if (hit) { setFuseOpen(v => !v); setNotice(fuseOpen ? 'Fuse shield closed.' : 'Fuse shield opened — inspect the fuse element inside.'); } };
           renderer.domElement.addEventListener('click', onClick);
@@ -133,6 +143,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         }
       }
       if (disposed) return;
+      enablePartDragging();
       const ray = new THREE.Raycaster(); const pointer = new THREE.Vector2();
       const onToolClick = (e: MouseEvent) => {
         if (round !== 2 || checked) return;
@@ -144,7 +155,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       (host as any).__toolClick = onToolClick;
     };
     load().catch((err) => setNotice(err instanceof Error ? `3D asset loading failed: ${err.message}` : '3D asset loading failed.')).finally(() => setLoading(false));
-    return () => { disposed = true; cancelAnimationFrame(frame); window.removeEventListener('resize', resize); (host as any).__cleanup?.(); if ((host as any).__toolClick) renderer.domElement.removeEventListener('click', (host as any).__toolClick); controls.dispose(); renderer.dispose(); if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement); };
+    return () => { disposed = true; cancelAnimationFrame(frame); window.removeEventListener('resize', resize); (host as any).__cleanup?.(); if ((host as any).__toolClick) renderer.domElement.removeEventListener('click', (host as any).__toolClick); dragControls?.dispose(); controls.dispose(); renderer.dispose(); if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement); };
   }, [round, fuseOpen, checked]);
 
   const check = () => {
@@ -160,7 +171,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     <header className="activityHeader"><div><div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div><strong>Technical Activity</strong></div><div className="activityScore">⚡ {score}/15</div></header>
     <main className="activityMain"><div className="activityIntro"><div><div className="eyebrow">STAGE 2 • 3D INTERACTIVE VALIDATION</div><h1>Electrical <span>Troubleshooting Lab</span></h1><p>Inspect the real authored 3D assets, rotate and zoom the equipment, then complete the task without relying on labels.</p></div><div className="activityProgress"><b>{round+1}/3</b><small>challenges</small></div></div>
       <div className="activityTrack"><i style={{ width: `${((round+1)/3)*100}%` }} /></div>
-      <section className="labGrid"><section className="labSceneCard"><div className="sceneToolbar"><div><b>3D Interactive Workbench</b><small>Drag to rotate • wheel to zoom • right-drag to pan</small></div><span className="modePill">AUTHORED 3D ASSETS</span></div><div className="threeViewport" ref={mount}>{loading&&<div className="assetLoading">Loading authored 3D models…</div>}</div><div className="sceneHint"><span>🖱️ Drag = rotate</span><span>◉ Wheel = zoom</span><span>⇧ Right-drag = pan</span>{round===1&&<span>🔎 Click fuse shield = open / close</span>}{round===2&&<span>🎯 Click a tool = select</span>}</div>{notice&&<div className="labNotice">{notice}</div>}</section>
+      <section className="labGrid"><section className="labSceneCard"><div className="sceneToolbar"><div><b>3D Interactive Workbench</b><small>Drag to rotate • wheel to zoom • right-drag to pan</small></div><span className="modePill">AUTHORED 3D ASSETS</span></div><div className="threeViewport" ref={mount}>{loading&&<div className="assetLoading">Loading authored 3D models…</div>}</div><div className="sceneHint"><span>🖱️ Drag = rotate</span><span>◉ Wheel = zoom</span><span>⇧ Right-drag = pan</span><span>✋ Drag parts = move separately</span>{round===1&&<span>🔎 Click fuse shield = open / close</span>}{round===2&&<span>🎯 Click a tool = select</span>}</div>{notice&&<div className="labNotice">{notice}</div>}</section>
         <section className="activityCard activityQuestion labQuestion"><div className="questionMeta"><span>Challenge {round+1} of 3</span><span>5 points</span></div><div className="fieldBadge">FIELD TASK</div><h2>{challenge.title}</h2><p className="symptom">{challenge.symptom}</p><div className="labRule"><b>Technician rule</b><span>Think → inspect → verify → act</span></div><h3>{challenge.question}</h3>
           {round===0&&<div className="taskInstruction">Trace the actual circuit visually. The first challenge intentionally contains only the battery, switch and bulb.</div>}
           {round===1&&<div className="taskInstruction">Open the transparent shield on the fuse and inspect the internal element. Do not rely on a text description.</div>}
