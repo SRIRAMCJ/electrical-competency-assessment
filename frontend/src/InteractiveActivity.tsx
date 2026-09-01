@@ -160,7 +160,7 @@ export default function InteractiveActivity({onFinish}:{onFinish:(score:number)=
   },[round,mode]);
 
   const choose=(i:number)=>{if(checked)return;setSelected(i);setChecked(true);if(i===challenge.answer)setScore(s=>s+5);};
-  const next=()=>{if(round===challenges.length-1){onFinish(score+(selected===challenge.answer?0:0));return;}setRound(r=>r+1);setSelected(null);setChecked(false);setNotice('New circuit loaded. Rotate, zoom and inspect every connection before answering.');};
+  const next=()=>{if(round===challenges.length-1){onFinish(score+(selected===challenge.answer?5:0));return;}setRound(r=>r+1);setSelected(null);setChecked(false);setNotice('New circuit loaded. Rotate, zoom and inspect every connection before answering.');};
 
   return <div className="activityPage threeLab">
     <style>{css}</style>
