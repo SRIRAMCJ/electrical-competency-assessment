@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
-const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/';
+const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@6dd0f64943ada965070017d62e0e11d09998d0a9/';
 const ASSETS = {
-  bulb: ASSET_BASE + 'BULB.fbx',
+  bulb: ASSET_BASE + 'BULB.FBX',
   battery: ASSET_BASE + 'battery.fbx',
   ammeter: ASSET_BASE + 'ampermeter.fbx',
   voltmeter: ASSET_BASE + 'voltmeter.fbx',
