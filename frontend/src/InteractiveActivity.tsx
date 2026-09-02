@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
-const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@6dd0f64943ada965070017d62e0e11d09998d0a9/';
+const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/';
 const ASSETS = {
   bulb: ASSET_BASE + 'BULB.FBX',
   battery: ASSET_BASE + 'battery.fbx',
@@ -58,9 +58,43 @@ async function loadFBX(url: string): Promise<THREE.Group> {
   return loaded;
 }
 function fitObject(g: THREE.Object3D, maxSize = 2.2) {
-  const box3 = new THREE.Box3().setFromObject(g); const size = box3.getSize(new THREE.Vector3());
-  const max = Math.max(size.x, size.y, size.z) || 1; const s = maxSize / max; g.scale.setScalar(s);
-  const b2 = new THREE.Box3().setFromObject(g); const c = b2.getCenter(new THREE.Vector3()); g.position.sub(new THREE.Vector3(c.x, b2.min.y, c.z));
+  const box3 = new THREE.Box3().setFromObject(g);
+  const size = box3.getSize(new THREE.Vector3());
+  const max = Math.max(size.x, size.y, size.z) || 1;
+  g.scale.setScalar(maxSize / max);
+  const b2 = new THREE.Box3().setFromObject(g);
+  const center = b2.getCenter(new THREE.Vector3());
+  g.position.sub(new THREE.Vector3(center.x, b2.min.y, center.z));
+}
+function visibleAsset(g: THREE.Object3D) {
+  g.traverse(o => {
+    if (o instanceof THREE.Mesh) {
+      o.visible = true;
+      o.castShadow = true;
+      o.receiveShadow = true;
+      const materials = Array.isArray(o.material) ? o.material : [o.material];
+      materials.forEach((m: any) => {
+        if (m) {
+          m.transparent = false;
+          m.opacity = 1;
+          m.side = THREE.DoubleSide;
+        }
+      });
+    }
+  });
+  return g;
+}
+function anchor(g: THREE.Object3D, side: 'left'|'right'|'top'|'bottom') {
+  const b = new THREE.Box3().setFromObject(g);
+  const center = b.getCenter(new THREE.Vector3());
+  if (side === 'left') return new THREE.Vector3(b.min.x - .08, Math.max(b.min.y + .35, center.y), center.z);
+  if (side === 'right') return new THREE.Vector3(b.max.x + .08, Math.max(b.min.y + .35, center.y), center.z);
+  if (side === 'top') return new THREE.Vector3(center.x, b.max.y + .05, center.z);
+  return new THREE.Vector3(center.x, b.min.y + .08, center.z);
+}
+function circuitWire(a: THREE.Vector3, b: THREE.Vector3, color: number) {
+  const g = wire(a, b, color);
+  return g;
 }
 
 export default function InteractiveActivity({ onFinish }: { onFinish: (score: number) => void }) {
@@ -95,7 +129,22 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     scene.add(new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 2)); const sun = new THREE.DirectionalLight(0xffffff, 2.8); sun.position.set(5, 9, 6); sun.castShadow = true; scene.add(sun);
     const floor = new THREE.Mesh(new THREE.BoxGeometry(16, .2, 10), mat(0xe7ebf0, { roughness: .9 })); floor.position.y = -1.05; floor.receiveShadow = true; scene.add(floor);
 
-    let frame = 0; const animate = () => { if (disposed) return; frame = requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }; animate();
+    let frame = 0;
+    const animate = () => {
+      if (disposed) return;
+      frame = requestAnimationFrame(animate);
+      controls.update();
+      const liveWires = (scene.userData as any).liveWires as {g: THREE.Group; a: () => THREE.Vector3; b: () => THREE.Vector3}[] | undefined;
+      if (liveWires) {
+        liveWires.forEach(w => {
+          const a = w.a(), b = w.b();
+          w.g.clear();
+          w.g.add(wire(a,b,0xdc2626));
+        });
+      }
+      renderer.render(scene, camera);
+    };
+    animate();
     const resize = () => { camera.aspect = host.clientWidth / Math.max(host.clientHeight, 1); camera.updateProjectionMatrix(); renderer.setSize(host.clientWidth, host.clientHeight); }; window.addEventListener('resize', resize);
 
     const load = async () => {
@@ -110,7 +159,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         ];
         for (const item of items) {
           if (item.url) {
-            try { const g = await loadFBX(item.url); fitObject(g, 2.1); g.position.x += item.x; g.position.y = 0; g.userData.toolKey = item.key; scene.add(g); draggable.push(g); }
+            try { const g = visibleAsset(await loadFBX(item.url)); fitObject(g, 2.1); g.position.x += item.x; g.position.y = 0; g.userData.toolKey = item.key; scene.add(g); draggable.push(g); }
             catch (err) { setNotice(`Unable to load ${item.key}. The 3D asset request failed.`); }
           } else {
             const g = item.key === 'soldering' ? (() => { const s = new THREE.Group(); const h = new THREE.Mesh(new THREE.CylinderGeometry(.16, .2, 1.35, 20), mat(0x374151)); h.rotation.z = Math.PI / 2; s.add(h); const tip = new THREE.Mesh(new THREE.CylinderGeometry(.045, .08, .7, 16), mat(0xcbd5e1, { metalness: .7 })); tip.rotation.z = Math.PI / 2; tip.position.x = .95; s.add(tip); return s; })() : (() => { const d = new THREE.Group(); d.add(box(1.15, .55, .55, mat(0x475569))); const grip = box(.28, .85, .35, mat(0x334155)); grip.position.set(-.15, -.45, 0); grip.rotation.z = -.12; d.add(grip); const ch = new THREE.Mesh(new THREE.CylinderGeometry(.13, .13, .35, 18), mat(0x94a3b8, { metalness: .7 })); ch.rotation.z = Math.PI / 2; ch.position.x = .75; d.add(ch); return d; })();
@@ -118,9 +167,20 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           }
         }
       } else {
-        const battery = await loadFBX(ASSETS.battery); fitObject(battery, 2.2); battery.position.set(-3.6, 0, 0); scene.add(battery); draggable.push(battery);
-        const bulb = await loadFBX(ASSETS.bulb); fitObject(bulb, 2.15); bulb.position.set(3.2, 0, 0); scene.add(bulb); draggable.push(bulb);
-        const sw = createSwitch(); sw.position.set(-.25, 0, 0); setShadows(sw); scene.add(sw); draggable.push(sw);
+        const battery = visibleAsset(await loadFBX(ASSETS.battery)); fitObject(battery, 1.65); battery.position.set(-3.45, 0, 0); scene.add(battery); draggable.push(battery);
+        const sw = createSwitch(); sw.position.set(-.65, 0, 0); setShadows(sw); scene.add(sw); draggable.push(sw);
+        let bulb: THREE.Group;
+        try {
+          bulb = visibleAsset(await loadFBX(ASSETS.bulb));
+          fitObject(bulb, 1.75);
+        } catch {
+          bulb = new THREE.Group();
+          const base = new THREE.Mesh(new THREE.CylinderGeometry(.42,.48,.28,24), mat(0x475569,{metalness:.55}));
+          const glass = new THREE.Mesh(new THREE.SphereGeometry(.62,32,20), mat(0xfff7bf,{emissive:0xffcc33,emissiveIntensity:.5,roughness:.16,transparent:false}));
+          base.position.y=.14; glass.position.y=.78; bulb.add(base,glass);
+          setNotice('BULB.FBX could not be loaded, so a temporary safety fallback bulb is shown.');
+        }
+        bulb.position.set(3.05, 0, 0); scene.add(bulb); draggable.push(bulb);
         if (round === 1) {
           const fuse = createFuse(); fuse.position.set(-2.05, 0, .05); setShadows(fuse); scene.add(fuse);
           const shield = fuse.getObjectByName('shield'); if (shield) shield.visible = !fuseOpen;
@@ -134,13 +194,23 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           const oldDispose = () => renderer.domElement.removeEventListener('click', onClick); window.addEventListener('beforeunload', oldDispose);
           (host as any).__cleanup = () => { oldDispose(); window.removeEventListener('beforeunload', oldDispose); };
         }
+        const liveWires: { g: THREE.Group; a: () => THREE.Vector3; b: () => THREE.Vector3 }[] = [];
+        const addLiveWire = (a: () => THREE.Vector3, b: () => THREE.Vector3, color: number) => {
+          const g = new THREE.Group(); scene.add(g);
+          liveWires.push({g,a,b});
+        };
         if (round === 0) {
-          const bp = new THREE.Vector3(-2.55, .65, 0), si = new THREE.Vector3(-.8, .35, 0), so = new THREE.Vector3(.3, .35, 0), lp = new THREE.Vector3(2.75, .65, 0), lm = new THREE.Vector3(2.75, -.15, 0), bm = new THREE.Vector3(-2.55, .45, 0);
-          scene.add(wire(bp, si, 0xdc2626), wire(so, lp, 0xdc2626), wire(lm, bm, 0x111827));
+          addLiveWire(() => anchor(battery,'right'), () => anchor(sw,'left'), 0xdc2626);
+          addLiveWire(() => anchor(sw,'right'), () => anchor(bulb,'left'), 0xdc2626);
+          addLiveWire(() => anchor(bulb,'bottom'), () => anchor(battery,'left'), 0x111827);
         } else {
-          const bp = new THREE.Vector3(-2.55, .65, 0), fi = new THREE.Vector3(-2.65, .42, 0), fo = new THREE.Vector3(-1.35, .42, 0), si = new THREE.Vector3(-.8, .35, 0), so = new THREE.Vector3(.3, .35, 0), lp = new THREE.Vector3(2.75, .65, 0), lm = new THREE.Vector3(2.75, -.15, 0), bm = new THREE.Vector3(-2.55, .45, 0);
-          scene.add(wire(bp, fi, 0xdc2626), wire(fo, si, 0xdc2626), wire(so, lp, 0xdc2626), wire(lm, bm, 0x111827));
+          const fuseRef = scene.getObjectByName('fuse')!;
+          addLiveWire(() => anchor(battery,'right'), () => anchor(fuseRef,'left'), 0xdc2626);
+          addLiveWire(() => anchor(fuseRef,'right'), () => anchor(sw,'left'), 0xdc2626);
+          addLiveWire(() => anchor(sw,'right'), () => anchor(bulb,'left'), 0xdc2626);
+          addLiveWire(() => anchor(bulb,'bottom'), () => anchor(battery,'left'), 0x111827);
         }
+        (scene.userData as any).liveWires = liveWires;
       }
       if (disposed) return;
       enablePartDragging();
@@ -173,7 +243,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       <div className="activityTrack"><i style={{ width: `${((round+1)/3)*100}%` }} /></div>
       <section className="labGrid"><section className="labSceneCard"><div className="sceneToolbar"><div><b>3D Interactive Workbench</b><small>Drag to rotate • wheel to zoom • right-drag to pan</small></div><span className="modePill">AUTHORED 3D ASSETS</span></div><div className="threeViewport" ref={mount}>{loading&&<div className="assetLoading">Loading authored 3D models…</div>}</div><div className="sceneHint"><span>🖱️ Drag = rotate</span><span>◉ Wheel = zoom</span><span>⇧ Right-drag = pan</span><span>✋ Drag parts = move separately</span>{round===1&&<span>🔎 Click fuse shield = open / close</span>}{round===2&&<span>🎯 Click a tool = select</span>}</div>{notice&&<div className="labNotice">{notice}</div>}</section>
         <section className="activityCard activityQuestion labQuestion"><div className="questionMeta"><span>Challenge {round+1} of 3</span><span>5 points</span></div><div className="fieldBadge">FIELD TASK</div><h2>{challenge.title}</h2><p className="symptom">{challenge.symptom}</p><div className="labRule"><b>Technician rule</b><span>Think → inspect → verify → act</span></div><h3>{challenge.question}</h3>
-          {round===0&&<div className="taskInstruction">Trace the actual circuit visually. The first challenge intentionally contains only the battery, switch and bulb.</div>}
+          {round===0&&<div className="taskInstruction">Trace the complete closed loop: battery → switch → bulb → battery return. The wires are connected to the components and follow them when you move the parts.</div>}
           {round===1&&<div className="taskInstruction">Open the transparent shield on the fuse and inspect the internal element. Do not rely on a text description.</div>}
           {round===2&&<div className="selectedTool">{selected?<>Selected: <b>{selected}</b></>:<span>No tool selected</span>}</div>}
           {!checked&&<button className="activityPrimary full" onClick={check}>{round===2?'Validate selected tool':'Validate inspection'}</button>}
