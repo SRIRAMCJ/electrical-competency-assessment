@@ -5,7 +5,7 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
 const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/3d%20elements/';
 const ASSETS = {
-  bulb: ASSET_BASE + 'BULB.fbx',
+  bulb: ASSET_BASE + 'Bulb.FBX',
   battery: ASSET_BASE + 'battery.fbx',
   ammeter: ASSET_BASE + 'Ammeter_Texture.fbx',
   voltmeter: ASSET_BASE + 'voltmeter.fbx',
@@ -160,12 +160,12 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     scene.background = new THREE.Color(0xf7f9fc);
 
     const camera = new THREE.PerspectiveCamera(
-      38,
+      42,
       host.clientWidth / Math.max(host.clientHeight, 1),
       0.05,
       100
     );
-    camera.position.set(6.7, 5.1, 8.4);
+    camera.position.set(6.8, 4.4, 8.8);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.6));
@@ -176,10 +176,11 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
-    controls.target.set(0, 0.35, 0);
+    controls.target.set(0, 0.05, 0);
     controls.minDistance = 3.5;
     controls.maxDistance = 14;
-    controls.maxPolarAngle = Math.PI * 0.49;
+    controls.maxPolarAngle = Math.PI * 0.48;
+    controls.minPolarAngle = 0.18;
 
     const draggables: THREE.Object3D[] = [];
     const dragControls = new DragControls(draggables, camera, renderer.domElement);
@@ -187,17 +188,18 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     dragControls.addEventListener('dragstart', () => { controls.enabled = false; });
     dragControls.addEventListener('dragend', () => { controls.enabled = true; });
 
-    scene.add(new THREE.HemisphereLight(0xffffff, 0xcbd5e1, 2));
+    scene.add(new THREE.HemisphereLight(0xffffff, 0xd9e0e8, 2.8));
     const keyLight = new THREE.DirectionalLight(0xffffff, 2.7);
-    keyLight.position.set(5, 9, 6);
+    keyLight.position.set(4, 8, 5);
     keyLight.castShadow = true;
+    keyLight.shadow.mapSize.set(1024, 1024);
     scene.add(keyLight);
 
     const floor = new THREE.Mesh(
-      new THREE.BoxGeometry(16, 0.2, 10),
+      new THREE.BoxGeometry(12, 0.18, 7),
       material(0xe7ebf0, { roughness: 0.9 })
     );
-    floor.position.y = -1.05;
+    floor.position.y = -1.0;
     floor.receiveShadow = true;
     scene.add(floor);
 
@@ -219,6 +221,21 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         group.visible = true;
         group.add(wire(endpoints.a(), endpoints.b(), endpoints.color));
       });
+    };
+
+    const frameCircuit = () => {
+      const visible = Object.values(components).filter(o => o.visible);
+      if (!visible.length) return;
+      const bounds = new THREE.Box3();
+      visible.forEach(o => bounds.expandByObject(o));
+      const center = bounds.getCenter(new THREE.Vector3());
+      const size = bounds.getSize(new THREE.Vector3());
+      const radius = Math.max(size.x, size.y, size.z, 3.8);
+      controls.target.set(center.x, Math.max(center.y - 0.1, 0), center.z);
+      camera.position.set(center.x + radius * 0.95, center.y + radius * 0.62, center.z + radius * 1.15);
+      camera.near = Math.max(0.03, radius / 200);
+      camera.far = Math.max(60, radius * 8);
+      camera.updateProjectionMatrix();
     };
 
     const load = async () => {
@@ -290,6 +307,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         }
 
         updateWires();
+        frameCircuit();
       } catch (error) {
         setNotice(error instanceof Error ? `Unable to load one of the authored 3D assets: ${error.message}` : 'Unable to load one of the authored 3D assets.');
       } finally {
@@ -448,4 +466,4 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
   );
 }
 
-const css = `*{box-sizing:border-box}.threeLab{min-height:100vh;width:100%;padding:0 28px 60px;background:radial-gradient(circle at 50% 0,#fff 0,#f3f6fb 65%);color:#172033;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.activityHeader{width:100%;max-width:1240px;margin:0 auto;padding:22px 0;display:flex;align-items:center;justify-content:space-between;gap:20px}.activityHeader strong{display:block;font-size:20px;margin-top:3px}.eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#71809a;text-transform:uppercase}.activityScore{min-width:92px;padding:11px 16px;border-radius:14px;background:#141c2e;color:#fff;text-align:center;font-weight:800}.activityMain{width:100%;max-width:1240px;margin:22px auto 0}.activityIntro{display:flex;align-items:flex-end;justify-content:space-between;gap:30px}.activityIntro h1{margin:12px 0 10px;color:#151d2f;font-size:46px;line-height:1.08}.activityIntro h1 span{color:#3863ed}.activityIntro p{margin:0;max-width:820px;color:#68758b;font-size:16px;line-height:1.65}.activityProgress{padding:14px 18px;border-radius:15px;background:#141c2e;color:#fff;text-align:center}.activityProgress b,.activityProgress small{display:block}.activityProgress small{margin-top:3px;font-size:9px;color:#b9c1d1}.activityTrack{height:7px;margin:24px 0 20px;background:#e5e9f0;border-radius:99px;overflow:hidden}.activityTrack i{display:block;height:100%;background:#3863ed;border-radius:99px;transition:.25s}.labGrid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(350px,.85fr);gap:20px;align-items:stretch}.labSceneCard{background:#fff;border:1px solid #e1e6ee;border-radius:20px;box-shadow:0 14px 35px rgba(23,32,51,.07);padding:18px;min-width:0}.sceneToolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.sceneToolbar b,.sceneToolbar small{display:block}.sceneToolbar small{font-size:10px;color:#8290a4;margin-top:3px}.modePill{padding:8px 10px;border-radius:10px;background:#eef4ff;color:#3863ed;font-size:9px;font-weight:900;letter-spacing:.7px}.threeViewport{height:520px;min-height:420px;border-radius:15px;overflow:hidden;background:#f7f9fc;cursor:grab;position:relative}.threeViewport:active{cursor:grabbing}.threeViewport canvas{display:block;width:100%;height:100%}.assetLoading{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:#68758b;font-size:12px;font-weight:800;background:rgba(247,249,252,.72);pointer-events:none}.sceneHint{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.sceneHint span{font-size:9px;font-weight:800;color:#68758b;background:#f4f6f9;border:1px solid #e3e7ed;border-radius:99px;padding:7px 9px}.labNotice{margin-top:10px;padding:10px 12px;border:1px solid #dbe5f4;border-radius:11px;background:#f5f8fe;color:#4e5f78;font-size:11px}.labQuestion{padding:25px}.fieldBadge{display:inline-block;margin-top:24px;padding:6px 9px;border-radius:8px;background:#eef4ff;color:#3863ed;font-size:9px;font-weight:900;letter-spacing:1px}.labQuestion h2{margin:10px 0 8px;font-size:24px;line-height:1.2}.symptom{margin:0;color:#68758b;font-size:13px;line-height:1.65}.labRule{margin:18px 0;padding:12px;border:1px solid #e4e9f1;border-radius:12px;background:#f7f9fd}.labRule b,.labRule span{display:block}.labRule b{font-size:10px;color:#3863ed}.labRule span{font-size:11px;color:#69768a;margin-top:4px}.labQuestion h3{font-size:16px;line-height:1.35;margin:20px 0 12px}.scenarioOptions{display:grid;gap:9px}.scenarioOption{width:100%;display:flex;align-items:flex-start;gap:11px;text-align:left;padding:12px;border:1px solid #e1e6ee;border-radius:12px;background:#fff;color:#172033;font:inherit;font-size:11px;line-height:1.45;cursor:pointer;transition:.16s}.scenarioOption:hover:not(:disabled){border-color:#9db3f5;transform:translateY(-1px)}.scenarioOption.selected{border-color:#3863ed;background:#f0f4ff;box-shadow:0 0 0 2px rgba(56,99,237,.08)}.scenarioOption:disabled{cursor:default}.optionLetter{flex:0 0 25px;width:25px;height:25px;display:grid;place-items:center;border-radius:8px;background:#eef1f5;font-size:10px;font-weight:900}.scenarioOption.selected .optionLetter{background:#3863ed;color:#fff}.activityPrimary{border:0;border-radius:11px;padding:12px 15px;background:#3863ed;color:#fff;font:inherit;font-size:11px;font-weight:800;cursor:pointer}.activityPrimary.full{width:100%;margin-top:12px}.activityFeedback{margin-top:13px;padding:12px;border-radius:12px}.activityFeedback.good{background:#eefbf2;border:1px solid #b8e6c7}.activityFeedback.bad{background:#fff5f5;border:1px solid #f1c2c2}.activityFeedback p{font-size:10px;color:#68758b;line-height:1.55;margin:5px 0 0}.activityActions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;color:#7a8799;font-size:10px;font-weight:700}@media(max-width:1050px){.labGrid{grid-template-columns:1fr}.threeViewport{height:500px}.activityIntro{align-items:flex-start}}@media(max-width:600px){.threeLab{padding:0 12px 40px}.activityIntro{display:block}.activityIntro h1{font-size:32px}.activityProgress{display:inline-block;margin-top:16px}.labSceneCard{padding:12px}.threeViewport{height:400px;min-height:350px}.sceneToolbar{align-items:flex-start;flex-direction:column}.labQuestion{padding:20px}.activityActions{align-items:stretch;flex-direction:column}.activityPrimary{width:100%}.sceneHint span{font-size:8px}}`;
+const css = `*{box-sizing:border-box}.threeLab{min-height:100vh;width:100%;padding:0 28px 60px;background:radial-gradient(circle at 50% 0,#fff 0,#f3f6fb 65%);color:#172033;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.activityHeader{width:100%;max-width:1240px;margin:0 auto;padding:22px 0;display:flex;align-items:center;justify-content:space-between;gap:20px}.activityHeader strong{display:block;font-size:20px;margin-top:3px}.eyebrow{font-size:10px;font-weight:900;letter-spacing:2px;color:#71809a;text-transform:uppercase}.activityScore{min-width:92px;padding:11px 16px;border-radius:14px;background:#141c2e;color:#fff;text-align:center;font-weight:800}.activityMain{width:100%;max-width:1240px;margin:22px auto 0}.activityIntro{display:flex;align-items:flex-end;justify-content:space-between;gap:30px}.activityIntro h1{margin:12px 0 10px;color:#151d2f;font-size:46px;line-height:1.08}.activityIntro h1 span{color:#3863ed}.activityIntro p{margin:0;max-width:820px;color:#68758b;font-size:16px;line-height:1.65}.activityProgress{padding:14px 18px;border-radius:15px;background:#141c2e;color:#fff;text-align:center}.activityProgress b,.activityProgress small{display:block}.activityProgress small{margin-top:3px;font-size:9px;color:#b9c1d1}.activityTrack{height:7px;margin:24px 0 20px;background:#e5e9f0;border-radius:99px;overflow:hidden}.activityTrack i{display:block;height:100%;background:#3863ed;border-radius:99px;transition:.25s}.labGrid{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(350px,.85fr);gap:20px;align-items:stretch}.labSceneCard{background:#fff;border:1px solid #e1e6ee;border-radius:20px;box-shadow:0 14px 35px rgba(23,32,51,.07);padding:18px;min-width:0}.sceneToolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px}.sceneToolbar b,.sceneToolbar small{display:block}.sceneToolbar small{font-size:10px;color:#8290a4;margin-top:3px}.modePill{padding:8px 10px;border-radius:10px;background:#eef4ff;color:#3863ed;font-size:9px;font-weight:900;letter-spacing:.7px}.threeViewport{height:560px;min-height:460px;border-radius:15px;overflow:hidden;background:linear-gradient(180deg,#f4f7fb 0%,#eef2f7 100%);cursor:grab;position:relative}.threeViewport:active{cursor:grabbing}.threeViewport canvas{display:block;width:100%;height:100%}.assetLoading{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:#68758b;font-size:12px;font-weight:800;background:rgba(247,249,252,.72);pointer-events:none}.sceneHint{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.sceneHint span{font-size:9px;font-weight:800;color:#68758b;background:#f4f6f9;border:1px solid #e3e7ed;border-radius:99px;padding:7px 9px}.labNotice{margin-top:10px;padding:10px 12px;border:1px solid #dbe5f4;border-radius:11px;background:#f5f8fe;color:#4e5f78;font-size:11px}.labQuestion{padding:25px}.fieldBadge{display:inline-block;margin-top:24px;padding:6px 9px;border-radius:8px;background:#eef4ff;color:#3863ed;font-size:9px;font-weight:900;letter-spacing:1px}.labQuestion h2{margin:10px 0 8px;font-size:24px;line-height:1.2}.symptom{margin:0;color:#68758b;font-size:13px;line-height:1.65}.labRule{margin:18px 0;padding:12px;border:1px solid #e4e9f1;border-radius:12px;background:#f7f9fd}.labRule b,.labRule span{display:block}.labRule b{font-size:10px;color:#3863ed}.labRule span{font-size:11px;color:#69768a;margin-top:4px}.labQuestion h3{font-size:16px;line-height:1.35;margin:20px 0 12px}.scenarioOptions{display:grid;gap:9px}.scenarioOption{width:100%;display:flex;align-items:flex-start;gap:11px;text-align:left;padding:12px;border:1px solid #e1e6ee;border-radius:12px;background:#fff;color:#172033;font:inherit;font-size:11px;line-height:1.45;cursor:pointer;transition:.16s}.scenarioOption:hover:not(:disabled){border-color:#9db3f5;transform:translateY(-1px)}.scenarioOption.selected{border-color:#3863ed;background:#f0f4ff;box-shadow:0 0 0 2px rgba(56,99,237,.08)}.scenarioOption:disabled{cursor:default}.optionLetter{flex:0 0 25px;width:25px;height:25px;display:grid;place-items:center;border-radius:8px;background:#eef1f5;font-size:10px;font-weight:900}.scenarioOption.selected .optionLetter{background:#3863ed;color:#fff}.activityPrimary{border:0;border-radius:11px;padding:12px 15px;background:#3863ed;color:#fff;font:inherit;font-size:11px;font-weight:800;cursor:pointer}.activityPrimary.full{width:100%;margin-top:12px}.activityFeedback{margin-top:13px;padding:12px;border-radius:12px}.activityFeedback.good{background:#eefbf2;border:1px solid #b8e6c7}.activityFeedback.bad{background:#fff5f5;border:1px solid #f1c2c2}.activityFeedback p{font-size:10px;color:#68758b;line-height:1.55;margin:5px 0 0}.activityActions{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:15px;color:#7a8799;font-size:10px;font-weight:700}@media(max-width:1050px){.labGrid{grid-template-columns:1fr}.threeViewport{height:500px}.activityIntro{align-items:flex-start}}@media(max-width:600px){.threeLab{padding:0 12px 40px}.activityIntro{display:block}.activityIntro h1{font-size:32px}.activityProgress{display:inline-block;margin-top:16px}.labSceneCard{padding:12px}.threeViewport{height:400px;min-height:350px}.sceneToolbar{align-items:flex-start;flex-direction:column}.labQuestion{padding:20px}.activityActions{align-items:stretch;flex-direction:column}.activityPrimary{width:100%}.sceneHint span{font-size:8px}}`;
