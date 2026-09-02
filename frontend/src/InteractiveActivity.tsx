@@ -5,7 +5,7 @@ import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
 const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/3d%20elements/';
 const ASSETS = {
-  bulb: ASSET_BASE + 'BULB.FBX',
+  bulb: ASSET_BASE + 'BULB.fbx',
   battery: ASSET_BASE + 'battery.fbx',
   ammeter: ASSET_BASE + 'Ammeter_Texture.fbx',
   voltmeter: ASSET_BASE + 'voltmeter.fbx',
@@ -75,7 +75,8 @@ const challenges: Challenge[] = [
       { key: 'battery', x: -3.4, y: 0, size: 1.35 },
       { key: 'bulb', x: -1.0, y: 0, size: 1.55 },
       { key: 'ammeter', x: 1.35, y: 0, size: 1.9 },
-      { key: 'voltmeter', x: 3.7, y: 0, size: 1.9 }
+      { key: 'voltmeter', x: 3.7, y: 0, size: 1.9 },
+      { key: 'variableResistor', x: 0.2, y: -0.25, z: -1.65, size: 1.35 }
     ]
   }
 ];
@@ -227,52 +228,65 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       setChecked(false);
 
       try {
+        const failedAssets: string[] = [];
         for (const item of challenge.assets) {
-          const object = await loadFBX(ASSETS[item.key]);
-          setShadows(object);
-          fitObject(object, item.size ?? 1.8);
-          object.position.x += item.x;
-          object.position.y = item.y ?? 0;
-          object.position.z = item.z ?? 0;
-          object.userData.assetKey = item.key;
-          scene.add(object);
-          draggables.push(object);
-          components[item.key + '_' + draggables.length] = object;
+          try {
+            const object = await loadFBX(ASSETS[item.key]);
+            setShadows(object);
+            fitObject(object, item.size ?? 1.8);
+            object.position.x += item.x;
+            object.position.y = item.y ?? 0;
+            object.position.z = item.z ?? 0;
+            object.userData.assetKey = item.key;
+            scene.add(object);
+            draggables.push(object);
+            components[item.key + '_' + draggables.length] = object;
+          } catch (assetError) {
+            failedAssets.push(`${item.key}: ${assetError instanceof Error ? assetError.message : 'request failed'}`);
+          }
         }
 
         const list = Object.values(components);
+        if (failedAssets.length) {
+          setNotice(`Some repository 3D elements could not be loaded — ${failedAssets.join(' | ')}`);
+        }
 
         if (round === 0) {
-          const battery = list.find(o => o.userData.assetKey === 'battery')!;
-          const bulb = list.find(o => o.userData.assetKey === 'bulb')!;
-          addWire(() => getAnchor(battery, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
-          // Deliberate open return path: this visible gap is the fault the learner must diagnose.
-          const gapPoint = getAnchor(battery, 'left');
-          const bulbReturn = getAnchor(bulb, 'right');
-          const gap = new THREE.Vector3(-0.35, (gapPoint.y + bulbReturn.y) / 2, 0);
-          addWire(() => bulbReturn, () => gap, 0x111827);
-          addWire(() => gap.clone().add(new THREE.Vector3(-0.55, 0, 0)), () => gapPoint, 0x111827);
+          const battery = list.find(o => o.userData.assetKey === 'battery');
+          const bulb = list.find(o => o.userData.assetKey === 'bulb');
+          if (battery && bulb) {
+            addWire(() => getAnchor(battery, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
+            // Deliberate open return path: the visible break is the fault to diagnose.
+            const gapPoint = getAnchor(battery, 'left');
+            const bulbReturn = getAnchor(bulb, 'right');
+            const gap = new THREE.Vector3(-0.35, (gapPoint.y + bulbReturn.y) / 2, 0);
+            addWire(() => bulbReturn, () => gap, 0x111827);
+            addWire(() => gap.clone().add(new THREE.Vector3(-0.55, 0, 0)), () => gapPoint, 0x111827);
+          }
         }
 
         if (round === 1) {
-          const battery = list.find(o => o.userData.assetKey === 'battery')!;
-          const resistor = list.find(o => o.userData.assetKey === 'variableResistor')!;
-          const bulb = list.find(o => o.userData.assetKey === 'bulb')!;
-          addWire(() => getAnchor(battery, 'right'), () => getAnchor(resistor, 'left'), 0xdc2626);
-          addWire(() => getAnchor(resistor, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
-          addWire(() => getAnchor(bulb, 'right'), () => getAnchor(battery, 'left'), 0x111827);
+          const battery = list.find(o => o.userData.assetKey === 'battery');
+          const resistor = list.find(o => o.userData.assetKey === 'variableResistor');
+          const bulb = list.find(o => o.userData.assetKey === 'bulb');
+          if (battery && resistor && bulb) {
+            addWire(() => getAnchor(battery, 'right'), () => getAnchor(resistor, 'left'), 0xdc2626);
+            addWire(() => getAnchor(resistor, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
+            addWire(() => getAnchor(bulb, 'right'), () => getAnchor(battery, 'left'), 0x111827);
+          }
         }
 
         if (round === 2) {
-          const battery = list.find(o => o.userData.assetKey === 'battery')!;
-          const bulb = list.find(o => o.userData.assetKey === 'bulb')!;
-          const ammeter = list.find(o => o.userData.assetKey === 'ammeter')!;
-          const voltmeter = list.find(o => o.userData.assetKey === 'voltmeter')!;
-          addWire(() => getAnchor(battery, 'right'), () => getAnchor(ammeter, 'left'), 0xdc2626);
-          addWire(() => getAnchor(ammeter, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
-          addWire(() => getAnchor(bulb, 'right'), () => getAnchor(battery, 'left'), 0x111827);
-          // Voltmeter is present as a separate inspection instrument, not part of the current path.
-          voltmeter.userData.role = 'inspection-tool';
+          const battery = list.find(o => o.userData.assetKey === 'battery');
+          const bulb = list.find(o => o.userData.assetKey === 'bulb');
+          const ammeter = list.find(o => o.userData.assetKey === 'ammeter');
+          const voltmeter = list.find(o => o.userData.assetKey === 'voltmeter');
+          if (battery && bulb && ammeter) {
+            addWire(() => getAnchor(battery, 'right'), () => getAnchor(ammeter, 'left'), 0xdc2626);
+            addWire(() => getAnchor(ammeter, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
+            addWire(() => getAnchor(bulb, 'right'), () => getAnchor(battery, 'left'), 0x111827);
+          }
+          if (voltmeter) voltmeter.userData.role = 'inspection-tool';
         }
 
         updateWires();
@@ -353,7 +367,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <div>
             <div className="eyebrow">STAGE 2 • 3D INTERACTIVE VALIDATION</div>
             <h1>Electrical <span>Troubleshooting Lab</span></h1>
-            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit.</p>
+            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit. Every visible electrical device is loaded from the repository <b>3d elements</b> folder.</p>
           </div>
           <div className="activityProgress"><b>{round + 1}/3</b><small>challenges</small></div>
         </div>
