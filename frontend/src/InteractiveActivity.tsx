@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
 const CIRCUIT_ASSET_URL = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/circuit/circuit.glb';
@@ -212,12 +211,6 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     controls.maxPolarAngle = Math.PI * 0.48;
     controls.minPolarAngle = 0.18;
 
-    const draggables: THREE.Object3D[] = [];
-    const dragControls = new DragControls(draggables, camera, renderer.domElement);
-    dragControls.transformGroup = false;
-    dragControls.addEventListener('dragstart', () => { controls.enabled = false; });
-    dragControls.addEventListener('dragend', () => { controls.enabled = true; });
-
     scene.add(new THREE.HemisphereLight(0xffffff, 0xd9e0e8, 2.8));
     const keyLight = new THREE.DirectionalLight(0xffffff, 2.7);
     keyLight.position.set(4, 8, 5);
@@ -293,8 +286,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
             object.position.z = item.z ?? 0;
             object.userData.assetKey = item.key;
             scene.add(object);
-            draggables.push(object);
-            components[item.key + '_' + draggables.length] = object;
+            components[item.key + '_' + Object.keys(components).length] = object;
           } catch (assetError) {
             failedAssets.push(`${item.key}: ${assetError instanceof Error ? assetError.message : 'request failed'}`);
           }
@@ -309,7 +301,6 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         if (circuit) {
           circuit.userData.role = 'faulty-authored-circuit';
           circuit.userData.fault = 'wire-disconnected-near-switch';
-          circuit.userData.draggableAsAssembly = true;
         }
 
         updateWires();
@@ -344,7 +335,6 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       disposed = true;
       cancelAnimationFrame(frame);
       window.removeEventListener('resize', resize);
-      dragControls.dispose();
       controls.dispose();
       renderer.dispose();
       if (renderer.domElement.parentNode === host) host.removeChild(renderer.domElement);
@@ -391,7 +381,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <div>
             <div className="eyebrow">STAGE 2 • 3D INTERACTIVE VALIDATION</div>
             <h1>Electrical <span>Troubleshooting Lab</span></h1>
-            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit. This scenario uses the authored <b>circuit.glb</b> from the repository <b>circuit</b> folder. Inspect the actual physical arrangement and find the visible open-circuit fault.</p>
+            <p>Inspect the complete authored 3D circuit by rotating the whole view, then diagnose what happened to the circuit. This scenario uses the authored <b>circuit.glb</b> from the repository <b>circuit</b> folder. Inspect the actual physical arrangement and find the visible open-circuit fault.</p>
           </div>
           <div className="activityProgress"><b>{round + 1}/{challenges.length}</b><small>challenge</small></div>
         </div>
@@ -403,7 +393,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
             <div className="sceneToolbar">
               <div>
                 <b>3D Interactive Workbench</b>
-                <small>Drag = rotate • wheel = zoom • right-drag = pan • drag a component = move it separately</small>
+                <small>Drag = rotate entire circuit • wheel = zoom • right-drag = pan • individual components are fixed</small>
               </div>
               <span className="modePill">REPOSITORY 3D ELEMENTS</span>
             </div>
@@ -416,7 +406,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
               <span>🖱️ Drag = rotate view</span>
               <span>◉ Wheel = zoom</span>
               <span>⇧ Right-drag = pan</span>
-              <span>✋ Drag model = move separately</span>
+              <span>🔒 Circuit is fixed — rotate only</span>
             </div>
 
             {notice && <div className="labNotice">{notice}</div>}
