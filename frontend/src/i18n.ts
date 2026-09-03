@@ -37,6 +37,11 @@ const od: Record<string,string> = {
 'The wire is disconnected near the switch, creating an open circuit.':'ସ୍ୱିଚ୍ ନିକଟରେ ତାର ବିଚ୍ଛିନ୍ନ ହୋଇ ଓପନ୍ ସର୍କିଟ୍ ସୃଷ୍ଟି ହୋଇଛି।','The battery polarity is reversed, so the bulb cannot receive power.':'ବ୍ୟାଟେରୀର ପୋଲାରିଟି ଓଲଟା ଅଛି, ତେଣୁ ବଲ୍ବକୁ ବିଦ୍ୟୁତ୍ ମିଳିପାରୁନାହିଁ।','The bulb is short-circuited by another wire, bypassing the lamp.':'ଅନ୍ୟ ଏକ ତାର ବଲ୍ବକୁ ବାଇପାସ୍ କରି ଶର୍ଟ ସର୍କିଟ୍ କରିଛି।','The bulb has too much resistance for the battery to supply current.':'ବଲ୍ବର ପ୍ରତିରୋଧ ଅତ୍ୟଧିକ ଥିବାରୁ ବ୍ୟାଟେରୀ ଆବଶ୍ୟକ ଧାରା ଯୋଗାଇପାରୁନାହିଁ।','What most likely happened to the circuit and is causing the bulb to remain off?':'ସର୍କିଟ୍‌ରେ ସମ୍ଭାବ୍ୟ କଣ ଘଟିଛି ଯାହା ଫଳରେ ବଲ୍ବ ବନ୍ଦ ରହିଛି?'
 };
 
+hi['The technician reports that the bulb is not illuminating even though the circuit contains the battery, switch, wiring and bulb. Inspect the supplied 3D circuit carefully before diagnosing the fault.']='तकनीशियन के अनुसार बल्ब नहीं जल रहा है, जबकि सर्किट में बैटरी, स्विच, वायरिंग और बल्ब मौजूद हैं। खराबी का निदान करने से पहले दिए गए 3D सर्किट का ध्यानपूर्वक निरीक्षण करें।';
+od['The technician reports that the bulb is not illuminating even though the circuit contains the battery, switch, wiring and bulb. Inspect the supplied 3D circuit carefully before diagnosing the fault.']='ଟେକ୍ନିସିଆନ୍ କହୁଛନ୍ତି ଯେ ବ୍ୟାଟେରୀ, ସ୍ୱିଚ୍, ୱାୟରିଂ ଓ ବଲ୍ବ ଥିଲେ ମଧ୍ୟ ବଲ୍ବ ଜଳୁନାହିଁ। ତ୍ରୁଟି ନିର୍ଣ୍ଣୟ ପୂର୍ବରୁ ଦିଆଯାଇଥିବା 3D ସର୍କିଟ୍‌କୁ ଭଲଭାବେ ଯାଞ୍ଚ କରନ୍ତୁ।';
+hi['Battery']='बैटरी'; hi['Fuse']='फ्यूज़'; hi['Switch']='स्विच'; hi['Bulb']='बल्ब'; hi['Variable resistor']='वैरिएबल रेज़िस्टर'; hi['Ammeter']='एमीटर'; hi['Placed']='रखा गया'; hi['Drag to board']='बोर्ड पर ड्रैग करें';
+od['Battery']='ବ୍ୟାଟେରୀ'; od['Fuse']='ଫ୍ୟୁଜ୍'; od['Switch']='ସ୍ୱିଚ୍'; od['Bulb']='ବଲ୍ବ'; od['Variable resistor']='ଭେରିଏବଲ୍ ରେଜିଷ୍ଟର୍'; od['Ammeter']='ଆମିଟର୍'; od['Placed']='ରଖାଗଲା'; od['Drag to board']='ବୋର୍ଡକୁ ଡ୍ରାଗ୍ କରନ୍ତୁ';
+
 export function t(language: Language, text: string): string {
   return language === 'hi' ? (hi[text] || text) : language === 'or' ? (od[text] || text) : text;
 }
