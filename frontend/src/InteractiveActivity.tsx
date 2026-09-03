@@ -2,8 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-const CIRCUIT_ASSET_URL = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/circuit/CIRCUIT.fbx';
+const CIRCUIT_ASSET_URL = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/circuit/circuit.glb';
 
 type Option = { id: string; text: string };
 type Challenge = {
@@ -18,16 +19,16 @@ type Challenge = {
 
 const challenges: Challenge[] = [
   {
-    title: 'Circuit Challenge — Complete Circuit Inspection',
-    symptom: 'Inspect the supplied physical circuit and determine the correct measurement method before taking a reading.',
-    question: 'Which situation correctly explains what should happen during the measurement?',
-    correct: 'ammeter',
-    explanation: 'Inspect the complete authored circuit first. An ammeter measures current and is connected in series; a voltmeter measures voltage across a component.',
+    title: 'Scenario Challenge — Why Is the Bulb Dead?',
+    symptom: 'The technician reports that the bulb is not illuminating even though the circuit contains the battery, switch, wiring and bulb. Inspect the supplied 3D circuit carefully before diagnosing the fault.',
+    question: 'What most likely happened to the circuit and is causing the bulb to remain off?',
+    correct: 'switch-wire-disconnected',
+    explanation: 'The wire is disconnected near the switch, leaving the circuit open. Current cannot complete its path from the battery through the switch and bulb and back to the battery, so the bulb remains off.',
     options: [
-      { id: 'ammeter', text: 'Use the ammeter in series to check the current flowing through the lamp.' },
-      { id: 'voltmeter', text: 'Connect the voltmeter in series and use it as the current meter.' },
-      { id: 'resistor', text: 'Replace the measurement instrument with the variable resistor.' },
-      { id: 'battery', text: 'Use the battery itself as the current-measuring instrument.' }
+      { id: 'switch-wire-disconnected', text: 'The wire is disconnected near the switch, creating an open circuit.' },
+      { id: 'battery-reversed', text: 'The battery polarity is reversed, so the bulb cannot receive power.' },
+      { id: 'bulb-short', text: 'The bulb is short-circuited by another wire, bypassing the lamp.' },
+      { id: 'high-resistance', text: 'The bulb has too much resistance for the battery to supply current.' }
     ],
     assets: [
       { key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }
@@ -70,10 +71,10 @@ function setShadows(object: THREE.Object3D) {
   });
 }
 
-async function loadFBX(url: string) {
-  const mod = await import('three/examples/jsm/loaders/FBXLoader.js');
-  const loader = new mod.FBXLoader();
-  return loader.loadAsync(url);
+async function loadGLB(url: string) {
+  const loader = new GLTFLoader();
+  const gltf = await loader.loadAsync(url);
+  return gltf.scene;
 }
 
 function fitObject(object: THREE.Object3D, targetSize: number) {
@@ -280,7 +281,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
             let object: THREE.Object3D;
 
             if (item.key === 'circuit') {
-              object = await loadFBX(CIRCUIT_ASSET_URL);
+              object = await loadGLB(CIRCUIT_ASSET_URL);
             } else {
               object = createProceduralComponent(item.key);
             }
@@ -304,37 +305,11 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           setNotice(`Some repository 3D elements could not be loaded — ${failedAssets.join(' | ')}`);
         }
 
-        if (round === 0) {
-          const battery = list.find(o => o.userData.assetKey === 'battery');
-          const bulb = list.find(o => o.userData.assetKey === 'bulb');
-          if (battery && bulb) {
-            addWire(() => getAnchor(battery, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
-            // Deliberate open return path: the visible break is the fault to diagnose.
-            const gapPoint = getAnchor(battery, 'left');
-            const bulbReturn = getAnchor(bulb, 'right');
-            const gap = new THREE.Vector3(-0.35, (gapPoint.y + bulbReturn.y) / 2, 0);
-            addWire(() => bulbReturn, () => gap, 0x111827);
-            addWire(() => gap.clone().add(new THREE.Vector3(-0.55, 0, 0)), () => gapPoint, 0x111827);
-          }
-        }
-
-        if (round === 1) {
-          const battery = list.find(o => o.userData.assetKey === 'battery');
-          const resistor = list.find(o => o.userData.assetKey === 'variableResistor');
-          const bulb = list.find(o => o.userData.assetKey === 'bulb');
-          if (battery && resistor && bulb) {
-            addWire(() => getAnchor(battery, 'right'), () => getAnchor(resistor, 'left'), 0xdc2626);
-            addWire(() => getAnchor(resistor, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
-            addWire(() => getAnchor(bulb, 'right'), () => getAnchor(battery, 'left'), 0x111827);
-          }
-        }
-
-        if (round === 2) {
-          const circuit = list.find(o => o.userData.assetKey === 'circuit');
-          if (circuit) {
-            circuit.userData.role = 'complete-authored-circuit';
-            circuit.userData.draggableAsAssembly = true;
-          }
+        const circuit = list.find(o => o.userData.assetKey === 'circuit');
+        if (circuit) {
+          circuit.userData.role = 'faulty-authored-circuit';
+          circuit.userData.fault = 'wire-disconnected-near-switch';
+          circuit.userData.draggableAsAssembly = true;
         }
 
         updateWires();
@@ -408,7 +383,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div>
           <strong>Technical Activity</strong>
         </div>
-        <div className="activityScore">⚡ {score}/15</div>
+        <div className="activityScore">⚡ {score}/5</div>
       </header>
 
       <main className="activityMain">
@@ -416,9 +391,9 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <div>
             <div className="eyebrow">STAGE 2 • 3D INTERACTIVE VALIDATION</div>
             <h1>Electrical <span>Troubleshooting Lab</span></h1>
-            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit. The third challenge uses the complete authored circuit from the repository <b>circuit</b> folder; legacy component FBX files remain archived in GitHub only.</p>
+            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit. This scenario uses the authored <b>circuit.glb</b> from the repository <b>circuit</b> folder. Inspect the actual physical arrangement and find the visible open-circuit fault.</p>
           </div>
-          <div className="activityProgress"><b>{round + 1}/3</b><small>challenges</small></div>
+          <div className="activityProgress"><b>{round + 1}/{challenges.length}</b><small>challenge</small></div>
         </div>
 
         <div className="activityTrack"><i style={{ width: `${((round + 1) / challenges.length) * 100}%` }} /></div>
