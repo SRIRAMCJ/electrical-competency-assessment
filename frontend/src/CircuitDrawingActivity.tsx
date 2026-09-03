@@ -190,7 +190,7 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
 
             {(Object.keys(items) as Item[]).map((item) => {
               const p = placed[item]; if (!p) return null;
-              return <div key={item} className={`part ${item === 'battery' ? 'battery' : ''} ${item === 'rheostat' ? 'rheostat' : ''} ${item === 'ammeter' || item === 'voltmeter' ? 'meter' : ''} ${item === 'lamp' ? 'lamp' : ''}`} style={{ left: `${p.x}%`, top: `${p.y}%` }}>
+              return <div key={item} className={`part ${item === 'battery' ? 'battery' : ''} ${item === 'rheostat' ? 'rheostat' : ''} ${item === 'ammeter' ? 'meter' : ''} ${item === 'lamp' ? 'lamp' : ''}`} style={{ left: `${p.x}%`, top: `${p.y}%` }}>
                 <div className="symbol">{items[item].symbol}</div><small>{items[item].name}</small>
                 <button className="removePart" onClick={(event) => { event.stopPropagation(); remove(item); }}>×</button>
               </div>;
@@ -202,7 +202,7 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
                 const pos = positionOf(terminal); if (!pos) return null;
                 const connected = connections.some(([a, b]) => a === terminal || b === terminal);
                 return <button key={terminal} type="button" className={`terminal ${selected === terminal ? 'selected' : ''} ${connected ? 'connected' : ''}`} style={{ left: `${pos.x}%`, top: `${pos.y}%` }} onClick={(event) => { event.stopPropagation(); connect(terminal); }} aria-label={`Connect terminal ${terminal}`}>
-                  {terminalLabel[terminal] && <span className="terminalLabel" style={{ left: '50%', top: terminal === 'vp' ? '180%' : '-90%', transform: 'translate(-50%,-50%)' }}>{terminalLabel[terminal]}</span>}
+                  {terminalLabel[terminal] && <span className="terminalLabel" style={{ left: '50%', top: '-90%', transform: 'translate(-50%,-50%)' }}>{terminalLabel[terminal]}</span>}
                 </button>;
               });
             })}
