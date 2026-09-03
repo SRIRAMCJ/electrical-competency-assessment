@@ -33,32 +33,32 @@ const challenges: Challenge[] = [
     assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
   },
   {
-    title: 'Scenario Challenge — Suspected Blown Fuse',
-    symptom: 'A technician is troubleshooting a 12 V lamp circuit that is not operating. The fuse is suspected, but the circuit must be checked safely before replacing any component.',
-    question: 'What is the best diagnostic method for confirming whether the fuse is open?',
-    correct: 'fuse-continuity-isolated',
-    explanation: 'Isolate the circuit from its power source and check continuity across the fuse with an appropriate meter. An open reading indicates that the fuse has failed.',
+    title: 'Scenario — Decorative Light Strand',
+    symptom: 'You are setting up a strand of traditional decorative lights. One bulb burns out, causing the entire strand of 50 lights to turn off. You remove the burned-out bulb and insert a copper wire bridge in its place.',
+    question: 'What happens to the circuit and the remaining lights after you insert the wire bridge?',
+    correct: 'remaining-lights-brighter',
+    explanation: 'Traditional holiday lights without internal shunts are wired in series. A failed bulb creates an open circuit. Bridging it with a wire completes the circuit again, removes one bulb resistance from the series path, decreases total resistance, increases current, and makes the remaining bulbs glow slightly brighter.',
     options: [
-      { id: 'fuse-continuity-isolated', text: 'De-energize the circuit and check continuity across the fuse with a meter.' },
-      { id: 'fuse-visual-only', text: 'Replace the fuse immediately without testing it.' },
-      { id: 'fuse-current-series', text: 'Connect the meter in series across the fuse while the circuit is energized.' },
-      { id: 'fuse-increase-voltage', text: 'Increase the supply voltage to see whether the fuse starts conducting.' }
+      { id: 'strand-unlit', text: 'The entire strand stays unlit because the circuit remains broken.' },
+      { id: 'remaining-lights-brighter', text: 'The remaining bulbs light up, glow slightly brighter than before, and the total circuit resistance decreases.' },
+      { id: 'remaining-lights-dimmer', text: 'The remaining bulbs light up, but they glow dimmer than before because power is divided among fewer bulbs.' },
+      { id: 'remaining-bulbs-blow', text: 'All remaining bulbs immediately blow out due to a short circuit bypassing the entire voltage source.' }
     ],
-    assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
+    assets: []
   },
   {
-    title: 'Scenario Challenge — Verify Voltage at the Lamp',
-    symptom: 'The lamp circuit has been inspected and the technician now needs to determine whether the lamp is receiving the expected supply voltage before replacing the bulb.',
-    question: 'How should a voltmeter be connected to verify the voltage available at the lamp?',
-    correct: 'voltmeter-parallel-lamp',
-    explanation: 'A voltmeter measures potential difference, so it should be connected in parallel across the two lamp terminals. This allows the technician to determine whether the expected voltage is present at the load.',
+    title: 'Scenario — The High-Power Appliance Problem',
+    symptom: 'In a residential home, a wall outlet circuit is protected by a 15-ampere circuit breaker at a constant 120 volts. A 1200-watt hair dryer and an 800-watt toaster are running simultaneously. You plug in a 500-watt vacuum cleaner on the same circuit.',
+    question: 'What will happen, and why?',
+    correct: 'breaker-trips',
+    explanation: 'Household outlets are wired in parallel, so each appliance receives the full supply voltage. Total power is 2500 W, giving a total current of about 20.83 A (2500/120), which exceeds the 15 A breaker rating. The breaker trips to protect the circuit.',
     options: [
-      { id: 'voltmeter-parallel-lamp', text: 'Connect the voltmeter in parallel across the lamp terminals.' },
-      { id: 'voltmeter-series-lamp', text: 'Connect the voltmeter in series with the lamp.' },
-      { id: 'ammeter-parallel-lamp', text: 'Use an ammeter in parallel across the lamp terminals.' },
-      { id: 'battery-as-meter', text: 'Use the battery itself as the voltage-measuring instrument.' }
+      { id: 'series-safe', text: 'The circuit operates normally because house outlets are wired in series, dividing the voltage safely among the three devices.' },
+      { id: 'breaker-trips', text: 'The breaker trips because adding another parallel path decreases total circuit resistance, drawing approximately 20.8 A.' },
+      { id: 'half-power', text: 'The appliances continue working, but all three run at half-power because the breaker restricts current to 15 A.' },
+      { id: 'resistance-overload', text: 'The breaker trips because adding devices in parallel increases total electrical resistance beyond the breaker’s 15 A safety rating.' }
     ],
-    assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
+    assets: []
   }
 ]
 
@@ -205,7 +205,7 @@ function createProceduralComponent(key: 'battery' | 'bulb' | 'variableResistor')
   return group;
 }
 
-type ScenarioResult = { challenge: number; selected: string | null; correct: boolean };
+type ScenarioResult = { challenge: number; selected: string | null; correct: boolean; correctAnswer: string; explanation: string };
 
 export default function InteractiveActivity({ onFinish }: { onFinish: (score: number, results: ScenarioResult[]) => void }) {
   const lang = useLanguage();
@@ -304,6 +304,11 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       setSelected(null);
       setChecked(false);
 
+      if (!challenge.assets.length) {
+        setLoading(false);
+        return;
+      }
+
       try {
         const failedAssets: string[] = [];
         for (const item of challenge.assets) {
@@ -392,7 +397,9 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     const result: ScenarioResult = {
       challenge: round + 1,
       selected,
-      correct: selected === challenge.correct
+      correct: selected === challenge.correct,
+      correctAnswer: challenge.options.find(option => option.id === challenge.correct)?.text || '',
+      explanation: challenge.explanation
     };
     if (round === challenges.length - 1) {
       onFinish(nextScore, [...scenarioResults, result]);
@@ -428,40 +435,44 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
 
         <div className="activityTrack"><i style={{ width: `${((round + 1) / challenges.length) * 100}%` }} /></div>
 
-        <section className="labGrid">
-          <section className="labSceneCard">
-            <div className="sceneToolbar">
-              <div>
-                <b>{t(lang,'3D Interactive Workbench')}</b>
-                <small>{t(lang,'Drag = rotate entire circuit • wheel = zoom • right-drag = pan • individual components are fixed')}</small>
+        <section className={challenge.assets.length ? "labGrid" : "labGrid textOnlyGrid"}>
+          {challenge.assets.length > 0 && (
+            <section className="labSceneCard">
+              <div className="sceneToolbar">
+                <div>
+                  <b>{t(lang,'3D Interactive Workbench')}</b>
+                  <small>{t(lang,'Drag = rotate entire circuit • wheel = zoom • right-drag = pan • individual components are fixed')}</small>
+                </div>
+                <span className="modePill">{t(lang,'REPOSITORY 3D ELEMENTS')}</span>
               </div>
-              <span className="modePill">{t(lang,'REPOSITORY 3D ELEMENTS')}</span>
-            </div>
 
-            <div className="threeViewport" ref={mount}>
-              {loading && <div className="assetLoading">Loading 3D elements…</div>}
-            </div>
+              <div className="threeViewport" ref={mount}>
+                {loading && <div className="assetLoading">Loading 3D elements…</div>}
+              </div>
 
-            <div className="sceneHint">
-              <span>🖱️ {t(lang,'Drag = rotate view')}</span>
-              <span>◉ {t(lang,'Wheel = zoom')}</span>
-              <span>⇧ {t(lang,'Right-drag = pan')}</span>
-              <span>🔒 {t(lang,'Circuit is fixed — rotate only')}</span>
-            </div>
+              <div className="sceneHint">
+                <span>🖱️ {t(lang,'Drag = rotate view')}</span>
+                <span>◉ {t(lang,'Wheel = zoom')}</span>
+                <span>⇧ {t(lang,'Right-drag = pan')}</span>
+                <span>🔒 {t(lang,'Circuit is fixed — rotate only')}</span>
+              </div>
 
-            {notice && <div className="labNotice">{notice}</div>}
-          </section>
+              {notice && <div className="labNotice">{notice}</div>}
+            </section>
+          )}
 
-          <section className="activityCard activityQuestion labQuestion">
+          <section className={challenge.assets.length ? "activityCard activityQuestion labQuestion" : "activityCard activityQuestion labQuestion textOnlyQuestion"}>
             <div className="questionMeta"><span>Challenge {round + 1} of {challenges.length}</span><span>5 points</span></div>
             <div className="fieldBadge">{t(lang,'FIELD DIAGNOSIS')}</div>
             <h2>{t(lang,challenge.title)}</h2>
             <p className="symptom">{t(lang,challenge.symptom)}</p>
 
-            <div className="labRule">
-              <b>{t(lang,'Technician rule')}</b>
-              <span>{t(lang,'Inspect the physical circuit before choosing a diagnosis.')}</span>
-            </div>
+            {challenge.assets.length > 0 && (
+              <div className="labRule">
+                <b>{t(lang,'Technician rule')}</b>
+                <span>{t(lang,'Inspect the physical circuit before choosing a diagnosis.')}</span>
+              </div>
+            )}
 
             <h3>{t(lang,challenge.question)}</h3>
 
@@ -492,7 +503,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
             )}
 
             <div className="activityActions">
-              <span>{checked ? (lang==='en'?'+5 points available in the final report':lang==='hi'?'+5 अंक अंतिम रिपोर्ट में उपलब्ध हैं':'+5 ପଏଣ୍ଟ ଅନ୍ତିମ ରିପୋର୍ଟରେ ଉପଲବ୍ଧ') : t(lang,'Choose the diagnosis that best matches the 3D evidence.')}</span>
+              <span>{checked ? (lang==='en'?'+5 points available in the final report':lang==='hi'?'+5 अंक अंतिम रिपोर्ट में उपलब्ध हैं':'+5 ପଏଣ୍ଟ ଅନ୍ତିମ ରିପୋର୍ଟରେ ଉପଲବ୍ଧ') : (challenge.assets.length ? t(lang,'Choose the diagnosis that best matches the 3D evidence.') : t(lang,'Choose the answer that best matches the scenario.'))}</span>
               {checked && <button className="activityPrimary" onClick={next}>{round === challenges.length - 1 ? t(lang,'Continue →') : (lang==='en'?'Next challenge →':lang==='hi'?'अगली चुनौती →':'ପରବର୍ତ୍ତୀ ଚ୍ୟାଲେଞ୍ଜ →')}</button>}
             </div>
           </section>
