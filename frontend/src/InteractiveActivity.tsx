@@ -384,9 +384,6 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       return;
     }
     setChecked(true);
-    if (selected === challenge.correct) {
-      setScore(current => current + 5);
-    }
     setNotice('Diagnosis recorded. The answer will be revealed in the final result.');
   };
 
