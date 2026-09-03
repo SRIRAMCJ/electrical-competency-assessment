@@ -219,6 +219,15 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
   const [notice, setNotice] = useState('');
   const challenge = challenges[round];
 
+  // Reset answer state whenever the user enters a new scenario. Keep this
+  // separate from the 3D scene lifecycle so text-only scenarios are always
+  // immediately interactive after pressing "Next challenge".
+  useEffect(() => {
+    setSelected(null);
+    setChecked(false);
+    setNotice('');
+  }, [round]);
+
   useEffect(() => {
     if (!mount.current) return;
     const host = mount.current;
@@ -301,8 +310,6 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     const load = async () => {
       setLoading(true);
       setNotice('');
-      setSelected(null);
-      setChecked(false);
 
       if (!challenge.assets.length) {
         setLoading(false);
@@ -482,8 +489,11 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
                   key={option.id}
                   type="button"
                   className={`scenarioOption ${selected === option.id ? 'selected' : ''}`}
-                  onClick={() => !checked && setSelected(option.id)}
-                  disabled={checked}
+                  onClick={() => {
+                    if (checked) return;
+                    setSelected(option.id);
+                  }}
+                  aria-pressed={selected === option.id}
                 >
                   <span className="optionLetter">{String.fromCharCode(65 + index)}</span>
                   <span>{t(lang,option.text)}</span>
