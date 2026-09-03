@@ -413,7 +413,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <div className="eyebrow">{t(lang,'Electrical Competency Assessment')}</div>
           <strong>{t(lang,'Technical Activity')}</strong>
         </div>
-        <div className="activityScore">⚡ {score}/5</div>
+        <div className="activityScore">⚡ {score}/15</div>
       </header>
 
       <main className="activityMain">
