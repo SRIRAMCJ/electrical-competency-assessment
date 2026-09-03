@@ -45,3 +45,32 @@ od['Battery']='ବ୍ୟାଟେରୀ'; od['Fuse']='ଫ୍ୟୁଜ୍'; od['S
 export function t(language: Language, text: string): string {
   return language === 'hi' ? (hi[text] || text) : language === 'or' ? (od[text] || text) : text;
 }
+
+hi['Scenario Challenge — Identify the Fault Type']='परिदृश्य चुनौती — खराबी के प्रकार की पहचान करें';
+hi['Scenario Challenge — Safe First Action']='परिदृश्य चुनौती — पहला सुरक्षित कदम';
+hi['The same 3D circuit shows a visible gap in the conductor near the switch. The bulb remains off because the current path is interrupted.']='उसी 3D सर्किट में स्विच के पास चालक में एक स्पष्ट गैप दिखाई देता है। करंट का मार्ग बाधित होने के कारण बल्ब बंद है।';
+hi['How should the visible fault in this circuit be classified?']='इस सर्किट में दिखाई दे रही खराबी को कैसे वर्गीकृत किया जाना चाहिए?';
+hi['It is an open-circuit fault caused by a broken or disconnected conductor.']='यह टूटे या डिस्कनेक्टेड चालक के कारण ओपन-सर्किट फॉल्ट है।';
+hi['It is a short circuit that bypasses the bulb.']='यह एक शॉर्ट सर्किट है जो बल्ब को बायपास करता है।';
+hi['It is an overload caused by excessive current through the bulb.']='यह बल्ब में अत्यधिक धारा के कारण ओवरलोड है।';
+hi['It is a polarity fault caused by reversing the battery terminals.']='यह बैटरी टर्मिनलों को उलटने के कारण पोलैरिटी फॉल्ट है।';
+hi['The technician has identified the visible open circuit and is preparing to inspect the wiring around the switch before any repair is attempted.']='तकनीशियन ने दिखाई दे रहे ओपन सर्किट की पहचान कर ली है और मरम्मत से पहले स्विच के आसपास की वायरिंग का निरीक्षण करने की तैयारी कर रहा है।';
+hi['What is the appropriate first action before working on the electrical circuit?']='विद्युत सर्किट पर काम करने से पहले उचित पहला कदम क्या है?';
+hi['De-energize the circuit and verify that it is safely de-energized before working on it.']='सर्किट को डी-एनर्जाइज़ करें और काम शुरू करने से पहले यह सत्यापित करें कि वह सुरक्षित रूप से डी-एनर्जाइज़ है।';
+hi['Replace the bulb immediately without checking the circuit.']='सर्किट की जांच किए बिना तुरंत बल्ब बदलें।';
+hi['Bypass the switch with another wire while the circuit is energized.']='सर्किट चालू रहते हुए दूसरे तार से स्विच को बायपास करें।';
+hi['Increase the battery voltage to force current through the circuit.']='सर्किट में करंट प्रवाहित कराने के लिए बैटरी वोल्टेज बढ़ाएँ।';
+od['Scenario Challenge — Identify the Fault Type']='ପରିସ୍ଥିତି ଚ୍ୟାଲେଞ୍ଜ — ତ୍ରୁଟିର ପ୍ରକାର ଚିହ୍ନଟ କରନ୍ତୁ';
+od['Scenario Challenge — Safe First Action']='ପରିସ୍ଥିତି ଚ୍ୟାଲେଞ୍ଜ — ପ୍ରଥମ ସୁରକ୍ଷିତ ପଦକ୍ଷେପ';
+od['The same 3D circuit shows a visible gap in the conductor near the switch. The bulb remains off because the current path is interrupted.']='ସେହି 3D ସର୍କିଟ୍‌ରେ ସ୍ୱିଚ୍ ନିକଟରେ ତାରରେ ଏକ ସ୍ପଷ୍ଟ ବିଚ୍ଛେଦ ଦେଖାଯାଉଛି। କରେଣ୍ଟ୍ ପଥ ବାଧାପ୍ରାପ୍ତ ହେବାରୁ ବଲ୍ବ ବନ୍ଦ ରହିଛି।';
+od['How should the visible fault in this circuit be classified?']='ଏହି ସର୍କିଟ୍‌ରେ ଦେଖାଯାଉଥିବା ତ୍ରୁଟିକୁ କିପରି ବର୍ଗୀକୃତ କରାଯିବ?';
+od['It is an open-circuit fault caused by a broken or disconnected conductor.']='ଏହା ଭଙ୍ଗା କିମ୍ବା ବିଚ୍ଛିନ୍ନ ତାର ଯୋଗୁଁ ଏକ ଓପନ୍-ସର୍କିଟ୍ ତ୍ରୁଟି।';
+od['It is a short circuit that bypasses the bulb.']='ଏହା ବଲ୍ବକୁ ବାଇପାସ୍ କରୁଥିବା ଶର୍ଟ ସର୍କିଟ୍।';
+od['It is an overload caused by excessive current through the bulb.']='ଏହା ବଲ୍ବ ମାଧ୍ୟମରେ ଅତ୍ୟଧିକ କରେଣ୍ଟ୍ ଯୋଗୁଁ ଓଭରଲୋଡ୍।';
+od['It is a polarity fault caused by reversing the battery terminals.']='ଏହା ବ୍ୟାଟେରୀ ଟର୍ମିନାଲ୍ ଓଲଟାଇବା ଯୋଗୁଁ ପୋଲାରିଟି ତ୍ରୁଟି।';
+od['The technician has identified the visible open circuit and is preparing to inspect the wiring around the switch before any repair is attempted.']='ଟେକ୍ନିସିଆନ୍ ଦୃଶ୍ୟମାନ ଓପନ୍ ସର୍କିଟ୍ ଚିହ୍ନଟ କରିଛନ୍ତି ଏବଂ ମରାମତି ପୂର୍ବରୁ ସ୍ୱିଚ୍ ଚାରିପାଖର ୱାୟରିଂ ଯାଞ୍ଚ ପାଇଁ ପ୍ରସ୍ତୁତ ହେଉଛନ୍ତି।';
+od['What is the appropriate first action before working on the electrical circuit?']='ଇଲେକ୍ଟ୍ରିକାଲ୍ ସର୍କିଟ୍‌ରେ କାମ କରିବା ପୂର୍ବରୁ ଉଚିତ ପ୍ରଥମ ପଦକ୍ଷେପ କଣ?';
+od['De-energize the circuit and verify that it is safely de-energized before working on it.']='ସର୍କିଟ୍‌କୁ ଡି-ଏନର୍ଜାଇଜ୍ କରନ୍ତୁ ଏବଂ କାମ ପୂର୍ବରୁ ଏହା ସୁରକ୍ଷିତ ଭାବେ ଡି-ଏନର୍ଜାଇଜ୍ ହୋଇଛି ବୋଲି ଯାଞ୍ଚ କରନ୍ତୁ।';
+od['Replace the bulb immediately without checking the circuit.']='ସର୍କିଟ୍ ଯାଞ୍ଚ ନକରି ତୁରନ୍ତ ବଲ୍ବ ବଦଳାନ୍ତୁ।';
+od['Bypass the switch with another wire while the circuit is energized.']='ସର୍କିଟ୍ ଚାଲୁ ଥିବାବେଳେ ଅନ୍ୟ ଏକ ତାରରେ ସ୍ୱିଚ୍‌କୁ ବାଇପାସ୍ କରନ୍ତୁ।';
+od['Increase the battery voltage to force current through the circuit.']='ସର୍କିଟ୍‌ରେ କରେଣ୍ଟ୍ ପ୍ରବାହ କରାଇବା ପାଇଁ ବ୍ୟାଟେରୀ ଭୋଲ୍ଟେଜ୍ ବଢ଼ାନ୍ତୁ।';
