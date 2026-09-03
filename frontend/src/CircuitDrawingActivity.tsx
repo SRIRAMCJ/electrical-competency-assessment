@@ -170,7 +170,7 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
           <h3>{t(lang,'Components')}</h3>
           {(Object.keys(items) as Item[]).map((item) => (
             <div key={item} className="drawItem" draggable onDragStart={() => setDrag(item)}>
-              <span>{items[item].symbol}</span><div>{items[item].name}<small>{placed[item] ? 'Placed' : 'Drag to board'}</small></div>
+              <span>{items[item].symbol}</span><div>{t(lang,items[item].name)}<small>{placed[item] ? t(lang,'Placed') : t(lang,'Drag to board')}</small></div>
             </div>
           ))}
           <div className={`statusMessage ${message.startsWith('Incorrect') ? 'error' : message === 'Connection accepted.' ? 'ok' : ''}`}>
