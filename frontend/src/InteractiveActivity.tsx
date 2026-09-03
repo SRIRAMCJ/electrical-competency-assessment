@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { t, useLanguage } from './i18n';
 
 const CIRCUIT_ASSET_URL = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/circuit/circuit.glb';
 
@@ -179,6 +180,7 @@ function createProceduralComponent(key: 'battery' | 'bulb' | 'variableResistor')
 }
 
 export default function InteractiveActivity({ onFinish }: { onFinish: (score: number, selectedAnswer: string | null, correct: boolean) => void }) {
+  const lang = useLanguage();
   const mount = useRef<HTMLDivElement>(null);
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -374,8 +376,8 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
       <style>{css}</style>
       <header className="activityHeader">
         <div>
-          <div className="eyebrow">ELECTRICAL COMPETENCY ASSESSMENT</div>
-          <strong>Technical Activity</strong>
+          <div className="eyebrow">{t(lang,'Electrical Competency Assessment')}</div>
+          <strong>{t(lang,'Technical Activity')}</strong>
         </div>
         <div className="activityScore">⚡ {score}/5</div>
       </header>
@@ -384,8 +386,8 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         <div className="activityIntro">
           <div>
             <div className="eyebrow">STAGE 2 • 3D INTERACTIVE VALIDATION</div>
-            <h1>Electrical <span>Troubleshooting Lab</span></h1>
-            <p>Inspect the complete authored 3D circuit by rotating the whole view, then diagnose what happened to the circuit. This scenario uses the authored <b>circuit.glb</b> from the repository <b>circuit</b> folder. Inspect the actual physical arrangement and find the visible open-circuit fault.</p>
+            <h1>{lang==='en'?'Electrical':lang==='hi'?'इलेक्ट्रिकल':'ଇଲେକ୍ଟ୍ରିକାଲ୍'} <span>{t(lang,'Electrical Troubleshooting Lab')}</span></h1>
+            <p>{t(lang,'Inspect the complete authored 3D circuit by rotating the whole view, then diagnose what happened to the circuit. This scenario uses the authored circuit.glb from the repository circuit folder. Inspect the actual physical arrangement and find the visible open-circuit fault.')}</p>
           </div>
           <div className="activityProgress"><b>{round + 1}/{challenges.length}</b><small>challenge</small></div>
         </div>
@@ -396,10 +398,10 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <section className="labSceneCard">
             <div className="sceneToolbar">
               <div>
-                <b>3D Interactive Workbench</b>
-                <small>Drag = rotate entire circuit • wheel = zoom • right-drag = pan • individual components are fixed</small>
+                <b>{t(lang,'3D Interactive Workbench')}</b>
+                <small>{t(lang,'Drag = rotate entire circuit • wheel = zoom • right-drag = pan • individual components are fixed')}</small>
               </div>
-              <span className="modePill">REPOSITORY 3D ELEMENTS</span>
+              <span className="modePill">{t(lang,'REPOSITORY 3D ELEMENTS')}</span>
             </div>
 
             <div className="threeViewport" ref={mount}>
@@ -407,10 +409,10 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
             </div>
 
             <div className="sceneHint">
-              <span>🖱️ Drag = rotate view</span>
-              <span>◉ Wheel = zoom</span>
-              <span>⇧ Right-drag = pan</span>
-              <span>🔒 Circuit is fixed — rotate only</span>
+              <span>🖱️ {t(lang,'Drag = rotate view')}</span>
+              <span>◉ {t(lang,'Wheel = zoom')}</span>
+              <span>⇧ {t(lang,'Right-drag = pan')}</span>
+              <span>🔒 {t(lang,'Circuit is fixed — rotate only')}</span>
             </div>
 
             {notice && <div className="labNotice">{notice}</div>}
@@ -418,16 +420,16 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
 
           <section className="activityCard activityQuestion labQuestion">
             <div className="questionMeta"><span>Challenge {round + 1} of {challenges.length}</span><span>5 points</span></div>
-            <div className="fieldBadge">FIELD DIAGNOSIS</div>
-            <h2>{challenge.title}</h2>
-            <p className="symptom">{challenge.symptom}</p>
+            <div className="fieldBadge">{t(lang,'FIELD DIAGNOSIS')}</div>
+            <h2>{t(lang,challenge.title)}</h2>
+            <p className="symptom">{t(lang,challenge.symptom)}</p>
 
             <div className="labRule">
-              <b>Technician rule</b>
-              <span>Inspect the physical circuit before choosing a diagnosis.</span>
+              <b>{t(lang,'Technician rule')}</b>
+              <span>{t(lang,'Inspect the physical circuit before choosing a diagnosis.')}</span>
             </div>
 
-            <h3>{challenge.question}</h3>
+            <h3>{t(lang,challenge.question)}</h3>
 
             <div className="scenarioOptions">
               {challenge.options.map((option, index) => (
@@ -439,25 +441,25 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
                   disabled={checked}
                 >
                   <span className="optionLetter">{String.fromCharCode(65 + index)}</span>
-                  <span>{option.text}</span>
+                  <span>{t(lang,option.text)}</span>
                 </button>
               ))}
             </div>
 
             {!checked && (
-              <button className="activityPrimary full" onClick={validate}>Record diagnosis</button>
+              <button className="activityPrimary full" onClick={validate}>{t(lang,'Record diagnosis')}</button>
             )}
 
             {checked && (
               <div className="activityRecorded">
-                <b>Diagnosis recorded</b>
-                <p>Your answer has been saved. The correct diagnosis and explanation will be revealed in the final result.</p>
+                <b>{t(lang,'Diagnosis recorded')}</b>
+                <p>{t(lang,'Your answer has been saved. The correct diagnosis and explanation will be revealed in the final result.')}</p>
               </div>
             )}
 
             <div className="activityActions">
-              <span>{checked ? '+5 points available in the final report' : 'Choose the diagnosis that best matches the 3D evidence.'}</span>
-              {checked && <button className="activityPrimary" onClick={next}>{round === challenges.length - 1 ? 'Continue →' : 'Next challenge →'}</button>}
+              <span>{checked ? (lang==='en'?'+5 points available in the final report':lang==='hi'?'+5 अंक अंतिम रिपोर्ट में उपलब्ध हैं':'+5 ପଏଣ୍ଟ ଅନ୍ତିମ ରିପୋର୍ଟରେ ଉପଲବ୍ଧ') : t(lang,'Choose the diagnosis that best matches the 3D evidence.')}</span>
+              {checked && <button className="activityPrimary" onClick={next}>{round === challenges.length - 1 ? t(lang,'Continue →') : (lang==='en'?'Next challenge →':lang==='hi'?'अगली चुनौती →':'ପରବର୍ତ୍ତୀ ଚ୍ୟାଲେଞ୍ଜ →')}</button>}
             </div>
           </section>
         </section>
