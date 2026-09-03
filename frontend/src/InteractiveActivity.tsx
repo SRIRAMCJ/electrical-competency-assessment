@@ -225,13 +225,8 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     keyLight.shadow.mapSize.set(1024, 1024);
     scene.add(keyLight);
 
-    const floor = new THREE.Mesh(
-      new THREE.BoxGeometry(12, 0.18, 7),
-      material(0xe7ebf0, { roughness: 0.9 })
-    );
-    floor.position.y = -1.0;
-    floor.receiveShadow = true;
-    scene.add(floor);
+    // No synthetic base/floor: the scenario must display only the authored
+    // circuit.glb and its own geometry.
 
     const components: Record<string, THREE.Object3D> = {};
     const wireGroups: THREE.Group[] = [];
