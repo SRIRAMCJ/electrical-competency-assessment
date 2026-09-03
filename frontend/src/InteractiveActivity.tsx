@@ -205,7 +205,7 @@ function createProceduralComponent(key: 'battery' | 'bulb' | 'variableResistor')
   return group;
 }
 
-type ScenarioResult = { challenge: number; selected: string | null; correct: boolean; correctAnswer: string; explanation: string };
+type ScenarioResult = { challenge: number; selected: string | null; selectedText: string; correct: boolean; correctAnswer: string; explanation: string };
 
 export default function InteractiveActivity({ onFinish }: { onFinish: (score: number, results: ScenarioResult[]) => void }) {
   const lang = useLanguage();
@@ -404,6 +404,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     const result: ScenarioResult = {
       challenge: round + 1,
       selected,
+      selectedText: challenge.options.find(option => option.id === selected)?.text || '',
       correct: selected === challenge.correct,
       correctAnswer: challenge.options.find(option => option.id === challenge.correct)?.text || '',
       explanation: challenge.explanation
