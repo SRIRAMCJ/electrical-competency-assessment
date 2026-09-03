@@ -77,13 +77,20 @@ async function loadGLB(url: string) {
 }
 
 function fitObject(object: THREE.Object3D, targetSize: number) {
+  // Normalize the authored model, then place its footprint at the exact
+  // center of the workbench plane. This keeps the supplied circuit centered
+  // regardless of the GLB's original scene origin.
   const bounds = new THREE.Box3().setFromObject(object);
   const size = bounds.getSize(new THREE.Vector3());
   const largest = Math.max(size.x, size.y, size.z) || 1;
   object.scale.setScalar(targetSize / largest);
+
   const fitted = new THREE.Box3().setFromObject(object);
   const center = fitted.getCenter(new THREE.Vector3());
-  object.position.sub(new THREE.Vector3(center.x, fitted.min.y, center.z));
+
+  object.position.x -= center.x;
+  object.position.z -= center.z;
+  object.position.y -= fitted.min.y;
 }
 
 function getAnchor(object: THREE.Object3D, side: 'left' | 'right') {
@@ -249,13 +256,17 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
     const frameCircuit = () => {
       const visible = Object.values(components).filter(o => o.visible);
       if (!visible.length) return;
+
+      // The workbench plane is centered at world (0, 0, 0). Keep the
+      // inspection camera centered on that same point so the complete
+      // authored circuit appears in the middle of the plane.
       const bounds = new THREE.Box3();
       visible.forEach(o => bounds.expandByObject(o));
-      const center = bounds.getCenter(new THREE.Vector3());
       const size = bounds.getSize(new THREE.Vector3());
       const radius = Math.max(size.x, size.y, size.z, 3.8);
-      controls.target.set(center.x, Math.max(center.y - 0.1, 0), center.z);
-      camera.position.set(center.x + radius * 0.95, center.y + radius * 0.62, center.z + radius * 1.15);
+
+      controls.target.set(0, 0.05, 0);
+      camera.position.set(radius * 0.95, radius * 0.62, radius * 1.15);
       camera.near = Math.max(0.03, radius / 200);
       camera.far = Math.max(60, radius * 8);
       camera.updateProjectionMatrix();
