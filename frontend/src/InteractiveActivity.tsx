@@ -178,7 +178,7 @@ function createProceduralComponent(key: 'battery' | 'bulb' | 'variableResistor')
   return group;
 }
 
-export default function InteractiveActivity({ onFinish }: { onFinish: (score: number) => void }) {
+export default function InteractiveActivity({ onFinish }: { onFinish: (score: number, selectedAnswer: string | null, correct: boolean) => void }) {
   const mount = useRef<HTMLDivElement>(null);
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
@@ -363,7 +363,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
 
   const next = () => {
     if (round === challenges.length - 1) {
-      onFinish(score);
+      onFinish(score, selected, selected === challenge.correct);
       return;
     }
     setRound(current => current + 1);
@@ -447,19 +447,19 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
             </div>
 
             {!checked && (
-              <button className="activityPrimary full" onClick={validate}>Validate diagnosis</button>
+              <button className="activityPrimary full" onClick={validate}>Record diagnosis</button>
             )}
 
             {checked && (
-              <div className={`activityFeedback ${correct ? 'good' : 'bad'}`}>
-                <b>{correct ? 'Correct' : 'Incorrect'}</b>
-                <p>{correct ? challenge.explanation : `Correct diagnosis: ${challenge.options.find(option => option.id === challenge.correct)?.text}`}</p>
+              <div className="activityRecorded">
+                <b>Diagnosis recorded</b>
+                <p>Your answer has been saved. The correct diagnosis and explanation will be revealed in the final result.</p>
               </div>
             )}
 
             <div className="activityActions">
-              <span>{checked ? (correct ? '+5 points' : '0 points') : 'Choose the diagnosis that best matches the 3D evidence.'}</span>
-              {checked && <button className="activityPrimary" onClick={next}>{round === challenges.length - 1 ? 'Finish practical →' : 'Next challenge →'}</button>}
+              <span>{checked ? '+5 points available in the final report' : 'Choose the diagnosis that best matches the 3D evidence.'}</span>
+              {checked && <button className="activityPrimary" onClick={next}>{round === challenges.length - 1 ? 'Continue →' : 'Next challenge →'}</button>}
             </div>
           </section>
         </section>
