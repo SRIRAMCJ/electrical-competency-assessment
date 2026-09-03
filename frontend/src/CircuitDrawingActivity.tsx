@@ -1,15 +1,14 @@
 import { useMemo, useState } from 'react';
 
-type Item = 'battery' | 'ammeter' | 'lamp' | 'voltmeter' | 'rheostat';
+type Item = 'battery' | 'ammeter' | 'lamp' | 'rheostat';
 type Pos = { x: number; y: number };
-type Terminal = 'bp' | 'bm' | 'ri' | 'ro' | 'ai' | 'ao' | 'li' | 'lo' | 'vp' | 'vm';
+type Terminal = 'bp' | 'bm' | 'ri' | 'ro' | 'ai' | 'ao' | 'li' | 'lo';
 type Connection = [Terminal, Terminal];
 
 const items: Record<Item, { name: string; symbol: string }> = {
   battery: { name: 'Battery', symbol: '▮' },
   ammeter: { name: 'Ammeter', symbol: 'A' },
   lamp: { name: 'Bulb', symbol: '✕' },
-  voltmeter: { name: 'Voltmeter', symbol: 'V' },
   rheostat: { name: 'Variable resistor', symbol: '▱' },
 };
 
@@ -18,11 +17,10 @@ const terminals: Record<Item, Terminal[]> = {
   rheostat: ['ri', 'ro'],
   ammeter: ['ai', 'ao'],
   lamp: ['li', 'lo'],
-  voltmeter: ['vp', 'vm'],
 };
 
 const terminalLabel: Record<Terminal, string> = {
-  bp: '+', bm: '−', ri: '', ro: '', ai: '', ao: '', li: '', lo: '', vp: '+', vm: '−',
+  bp: '+', bm: '−', ri: '', ro: '', ai: '', ao: '', li: '', lo: '',
 };
 
 // Series path: Battery + -> Rheostat -> Ammeter -> Bulb -> Battery -.
@@ -32,8 +30,6 @@ const correctConnections: Connection[] = [
   ['ro', 'ai'],
   ['ao', 'li'],
   ['lo', 'bm'],
-  ['vp', 'li'],
-  ['vm', 'lo'],
 ];
 
 const terminalOwner = (terminal: Terminal): Item => {
@@ -41,7 +37,7 @@ const terminalOwner = (terminal: Terminal): Item => {
   if (terminal === 'ri' || terminal === 'ro') return 'rheostat';
   if (terminal === 'ai' || terminal === 'ao') return 'ammeter';
   if (terminal === 'li' || terminal === 'lo') return 'lamp';
-  return 'voltmeter';
+  return 'battery';
 };
 
 const terminalOffset: Record<Terminal, [number, number]> = {
@@ -53,8 +49,6 @@ const terminalOffset: Record<Terminal, [number, number]> = {
   ao: [6, 0],
   li: [-6, 0],
   lo: [6, 0],
-  vp: [0, -7],
-  vm: [0, 7],
 };
 
 const samePair = (a: Terminal, b: Terminal, pair: Connection) =>
@@ -178,7 +172,7 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
             </div>
           ))}
           <div className={`statusMessage ${message.startsWith('Incorrect') ? 'error' : message === 'Connection accepted.' ? 'ok' : ''}`}>
-            {message || 'Drag all five components onto the board, then connect the large terminal circles.'}
+            {message || 'Drag all four components onto the board, then connect the large terminal circles.'}
           </div>
         </aside>
 
@@ -215,7 +209,7 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
           </div>
 
           <div className="drawFooter">
-            <span className="drawStatus">{complete ? '✓ Circuit complete.' : `${Object.keys(placed).length}/5 components placed • ${correctCount}/${correctConnections.length} connections`}</span>
+            <span className="drawStatus">{complete ? '✓ Circuit complete.' : `${Object.keys(placed).length}/4 components placed • ${correctCount}/${correctConnections.length} connections`}</span>
             <button className="drawFinish" disabled={!complete} onClick={() => onFinish(20)}>Finish activity →</button>
           </div>
         </section>
