@@ -101,7 +101,9 @@ function Practical({placed,setPlaced,connections,setConnections,color,setColor,s
   if(color!==target.color){setErrors(e=>e+1);setSelected(null);setNotice(`❌ Wrong wire colour. ${labels[target.a]} → ${labels[target.b]} requires ${target.color}.`);return}
   const next=[...connections,target];setConnections(next);setSelected(null);setNotice(next.length===4?'🟢 Circuit wiring complete. Turn the switch ON to power the bulb.':'✓ Connection accepted.');
  };
- const terminalPos:Record<Terminal,[number,number]>={bp:[112,275],bm:[112,430],fi:[360,275],fo:[485,275],si:[610,275],so:[735,275],lp:[940,275],lm:[940,430]};
+ // Terminal anchors sit along the lower edge of each placed component so the
+ // terminal name is rendered directly underneath its respective element.
+ const terminalPos:Record<Terminal,[number,number]>={bp:[120,385],bm:[155,385],fi:[400,405],fo:[455,405],si:[600,385],so:[655,385],lp:[860,385],lm:[915,385]};
  const map=useMemo(()=>new Set(connections.map(c=>`${c.a}-${c.b}`)),[connections]);
  const materialSlots:Record<Part,{left:string;top:string}>={battery:{left:'4%',top:'35%'},fuse:{left:'28%',top:'38%'},switch:{left:'51%',top:'35%'},lamp:{left:'76%',top:'34%'}};
  const renderWire=(c:Connection,i:number)=>{const pos=terminalPos;const[x1,y1]=pos[c.a],[x2,y2]=pos[c.b];const mx=(x1+x2)/2;const d=c.color==='Black'?`M ${x1} ${y1} C ${mx} 520, ${mx} 520, ${x2} ${y2}`:`M ${x1} ${y1} C ${mx} ${y1-60}, ${mx} ${y2+60}, ${x2} ${y2}`;return <g key={i} pointerEvents="none"><path d={d} stroke="#fff" strokeWidth="24" fill="none" strokeLinecap="round"/><path d={d} stroke={wire[c.color]} strokeWidth="12" fill="none" strokeLinecap="round"/></g>};
