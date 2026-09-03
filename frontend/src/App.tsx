@@ -48,7 +48,7 @@ export default function App(){
  const[drawingScore,setDrawingScore]=useState(0);
  const[drawingAttempts,setDrawingAttempts]=useState(0);
  const[drawingMistakes,setDrawingMistakes]=useState(0);
- const[scenarioResults,setScenarioResults]=useState<Array<{challenge:number;selected:string|null;correct:boolean;correctAnswer:string;explanation:string}>>([]);
+ const[scenarioResults,setScenarioResults]=useState<Array<{challenge:number;selected:string|null;selectedText:string;correct:boolean;correctAnswer:string;explanation:string}>>([]);
  const[answers,setAnswers]=useState<Record<number,string>>({});
  const[time,setTime]=useState(600);
  const[placed,setPlaced]=useState<Record<Part,boolean>>({battery:false,fuse:false,switch:false,lamp:false});
