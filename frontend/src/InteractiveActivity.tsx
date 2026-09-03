@@ -3,14 +3,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { DragControls } from 'three/examples/jsm/controls/DragControls.js';
 
-const ASSET_BASE = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/3d%20elements/';
-const ASSETS = {
-  bulb: ASSET_BASE + 'Bulb.FBX',
-  battery: ASSET_BASE + 'battery.fbx',
-  ammeter: ASSET_BASE + 'Ammeter_Texture.fbx',
-  voltmeter: ASSET_BASE + 'voltmeter.fbx',
-  variableResistor: ASSET_BASE + 'variable%20resistor.fbx'
-} as const;
+const CIRCUIT_ASSET_URL = 'https://cdn.jsdelivr.net/gh/SRIRAMCJ/electrical-competency-assessment@main/circuit/CIRCUIT.fbx';
 
 type Option = { id: string; text: string };
 type Challenge = {
@@ -20,7 +13,7 @@ type Challenge = {
   correct: string;
   explanation: string;
   options: Option[];
-  assets: Array<{ key: keyof typeof ASSETS; x: number; y?: number; z?: number; size?: number }>;
+  assets: Array<{ key: 'battery' | 'bulb' | 'variableResistor' | 'circuit'; x: number; y?: number; z?: number; size?: number }>;
 };
 
 const challenges: Challenge[] = [
@@ -29,7 +22,7 @@ const challenges: Challenge[] = [
     symptom: 'The 12V bulb is connected to the battery, but it is not illuminating.',
     question: 'What most likely happened to this circuit?',
     correct: 'open',
-    explanation: 'The return path is visibly broken. Current cannot complete the loop from the bulb back to the battery.',
+    explanation: 'The return path is intentionally broken. Current cannot complete the loop from the bulb back to the battery.',
     options: [
       { id: 'open', text: 'The return wire is disconnected, creating an open circuit.' },
       { id: 'reverse', text: 'The battery polarity is reversed, so the bulb cannot work.' },
@@ -37,13 +30,13 @@ const challenges: Challenge[] = [
       { id: 'high', text: 'The battery voltage is too high for the circuit.' }
     ],
     assets: [
-      { key: 'battery', x: -2.5, size: 1.65 },
-      { key: 'bulb', x: 2.25, size: 1.8 }
+      { key: 'battery', x: -2.6, size: 1.7 },
+      { key: 'bulb', x: 2.5, size: 1.9 }
     ]
   },
   {
     title: 'Fault 2 — Excessive Resistance',
-    symptom: 'The 12V bulb is connected, but it is glowing much dimmer than expected.',
+    symptom: 'The 12V bulb is connected to the battery, but it is glowing much dimmer than expected.',
     question: 'What is the most likely cause shown by the circuit?',
     correct: 'resistance',
     explanation: 'The variable resistor is in series with the lamp. Excessive resistance limits current and makes the bulb dim.',
@@ -54,17 +47,17 @@ const challenges: Challenge[] = [
       { id: 'voltage', text: 'The voltmeter is increasing the circuit voltage.' }
     ],
     assets: [
-      { key: 'battery', x: -3.0, size: 1.5 },
+      { key: 'battery', x: -3.0, size: 1.55 },
       { key: 'variableResistor', x: 0, size: 2.0 },
-      { key: 'bulb', x: 3.0, size: 1.7 }
+      { key: 'bulb', x: 3.0, size: 1.8 }
     ]
   },
   {
-    title: 'Fault 3 — Wrong Measurement Method',
-    symptom: 'A technician needs to diagnose a circuit where the lamp current is suspected to be low.',
+    title: 'Fault 3 — Complete Circuit Inspection',
+    symptom: 'A technician must diagnose the supplied physical circuit and determine the correct measurement method.',
     question: 'Which situation correctly explains what should happen during the measurement?',
     correct: 'ammeter',
-    explanation: 'An ammeter is used to measure current and is placed in series with the circuit. A voltmeter is used across a component to measure voltage.',
+    explanation: 'Inspect the complete authored circuit first. An ammeter measures current and is connected in series; a voltmeter measures voltage across a component.',
     options: [
       { id: 'ammeter', text: 'Use the ammeter in series to check the current flowing through the lamp.' },
       { id: 'voltmeter', text: 'Connect the voltmeter in series and use it as the current meter.' },
@@ -72,11 +65,7 @@ const challenges: Challenge[] = [
       { id: 'battery', text: 'Use the battery itself as the current-measuring instrument.' }
     ],
     assets: [
-      { key: 'battery', x: -3.4, y: 0, size: 1.35 },
-      { key: 'bulb', x: -1.0, y: 0, size: 1.55 },
-      { key: 'ammeter', x: 1.35, y: 0, size: 1.9 },
-      { key: 'voltmeter', x: 3.7, y: 0, size: 1.9 },
-      { key: 'variableResistor', x: 0.2, y: -0.25, z: -1.65, size: 1.35 }
+      { key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }
     ]
   }
 ];
@@ -140,6 +129,81 @@ function getAnchor(object: THREE.Object3D, side: 'left' | 'right') {
     center.y + 0.15,
     center.z
   );
+}
+
+function createProceduralComponent(key: 'battery' | 'bulb' | 'variableResistor'): THREE.Group {
+  const group = new THREE.Group();
+
+  if (key === 'battery') {
+    const body = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.45, 0.45, 1.6, 32),
+      material(0x242424, { metalness: 0.25, roughness: 0.38 })
+    );
+    body.rotation.z = Math.PI / 2;
+    group.add(body);
+
+    const positive = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.12, 0.12, 0.12, 24),
+      material(0xb7791f, { metalness: 0.65, roughness: 0.28 })
+    );
+    positive.rotation.z = Math.PI / 2;
+    positive.position.x = 0.86;
+    group.add(positive);
+
+    const negative = positive.clone();
+    negative.material = material(0x7b8794, { metalness: 0.55, roughness: 0.32 });
+    negative.position.x = -0.86;
+    group.add(negative);
+  }
+
+  if (key === 'bulb') {
+    const base = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.38, 0.45, 0.45, 32),
+      material(0x4b5563, { metalness: 0.55, roughness: 0.3 })
+    );
+    base.position.y = -0.25;
+    group.add(base);
+
+    const glass = new THREE.Mesh(
+      new THREE.SphereGeometry(0.62, 40, 24),
+      new THREE.MeshPhysicalMaterial({
+        color: 0xf8fafc,
+        transmission: 0.35,
+        transparent: true,
+        opacity: 0.88,
+        roughness: 0.08,
+        metalness: 0.02
+      })
+    );
+    glass.position.y = 0.3;
+    group.add(glass);
+
+    const filament = new THREE.Mesh(
+      new THREE.TorusGeometry(0.18, 0.025, 10, 28, Math.PI),
+      material(0xd97706, { emissive: 0x7c2d12, emissiveIntensity: 0.35 })
+    );
+    filament.rotation.x = Math.PI / 2;
+    filament.position.y = 0.28;
+    group.add(filament);
+  }
+
+  if (key === 'variableResistor') {
+    const body = new THREE.Mesh(
+      new THREE.BoxGeometry(1.65, 0.55, 0.7),
+      material(0x1f2937, { metalness: 0.25, roughness: 0.42 })
+    );
+    group.add(body);
+
+    const shaft = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.18, 0.18, 0.28, 24),
+      material(0x9ca3af, { metalness: 0.75, roughness: 0.25 })
+    );
+    shaft.rotation.z = Math.PI / 2;
+    shaft.position.y = 0.42;
+    group.add(shaft);
+  }
+
+  return group;
 }
 
 export default function InteractiveActivity({ onFinish }: { onFinish: (score: number) => void }) {
@@ -248,7 +312,14 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         const failedAssets: string[] = [];
         for (const item of challenge.assets) {
           try {
-            const object = await loadFBX(ASSETS[item.key]);
+            let object: THREE.Object3D;
+
+            if (item.key === 'circuit') {
+              object = await loadFBX(CIRCUIT_ASSET_URL);
+            } else {
+              object = createProceduralComponent(item.key);
+            }
+
             setShadows(object);
             fitObject(object, item.size ?? 1.8);
             object.position.x += item.x;
@@ -294,16 +365,11 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
         }
 
         if (round === 2) {
-          const battery = list.find(o => o.userData.assetKey === 'battery');
-          const bulb = list.find(o => o.userData.assetKey === 'bulb');
-          const ammeter = list.find(o => o.userData.assetKey === 'ammeter');
-          const voltmeter = list.find(o => o.userData.assetKey === 'voltmeter');
-          if (battery && bulb && ammeter) {
-            addWire(() => getAnchor(battery, 'right'), () => getAnchor(ammeter, 'left'), 0xdc2626);
-            addWire(() => getAnchor(ammeter, 'right'), () => getAnchor(bulb, 'left'), 0xdc2626);
-            addWire(() => getAnchor(bulb, 'right'), () => getAnchor(battery, 'left'), 0x111827);
+          const circuit = list.find(o => o.userData.assetKey === 'circuit');
+          if (circuit) {
+            circuit.userData.role = 'complete-authored-circuit';
+            circuit.userData.draggableAsAssembly = true;
           }
-          if (voltmeter) voltmeter.userData.role = 'inspection-tool';
         }
 
         updateWires();
@@ -385,7 +451,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
           <div>
             <div className="eyebrow">STAGE 2 • 3D INTERACTIVE VALIDATION</div>
             <h1>Electrical <span>Troubleshooting Lab</span></h1>
-            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit. Every visible electrical device is loaded from the repository <b>3d elements</b> folder.</p>
+            <p>Inspect the authored 3D equipment, rotate and move each component independently, then diagnose what happened to the circuit. The third challenge uses the complete authored circuit from the repository <b>circuit</b> folder; legacy component FBX files remain archived in GitHub only.</p>
           </div>
           <div className="activityProgress"><b>{round + 1}/3</b><small>challenges</small></div>
         </div>
