@@ -58,13 +58,15 @@ const samePair = (a: Terminal, b: Terminal, pair: Connection) =>
 const pairAlreadyConnected = (a: Terminal, b: Terminal, connections: Connection[]) =>
   connections.some((connection) => samePair(a, b, connection));
 
-export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score: number) => void }) {
+export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score: number, stats: { attempts: number; mistakes: number }) => void }) {
   const lang = useLanguage();
   const [placed, setPlaced] = useState<Partial<Record<Item, Pos>>>({});
   const [selected, setSelected] = useState<Terminal | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
   const [drag, setDrag] = useState<Item | null>(null);
   const [message, setMessage] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const [mistakes, setMistakes] = useState(0);
 
   const allPlaced = (Object.keys(items) as Item[]).every((item) => Boolean(placed[item]));
   const correctCount = useMemo(
@@ -101,32 +103,36 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
       return;
     }
 
-    if (selected === terminal) {
-      setSelected(null);
-      setMessage('');
-      return;
-    }
-
-    if (terminalOwner(selected) === terminalOwner(terminal)) {
-      setSelected(null);
-      setMessage('A component cannot be connected to itself.');
-      return;
-    }
-
-    if (pairAlreadyConnected(selected, terminal, connections)) {
-      setSelected(null);
-      setMessage('Those terminals are already connected.');
-      return;
-    }
-
-    if (!correctConnections.some((target) => samePair(selected, terminal, target))) {
-      setSelected(null);
-      setMessage('Incorrect connection. Try another terminal.');
-      return;
-    }
-
-    setConnections((current) => [...current, [selected, terminal]]);
+    const first = selected;
     setSelected(null);
+    setAttempts((value) => value + 1);
+
+    const recordMistake = (text: string) => {
+      setMistakes((value) => value + 1);
+      setMessage(text);
+    };
+
+    if (first === terminal) {
+      recordMistake('Choose two different terminals.');
+      return;
+    }
+
+    if (terminalOwner(first) === terminalOwner(terminal)) {
+      recordMistake('A component cannot be connected to itself.');
+      return;
+    }
+
+    if (pairAlreadyConnected(first, terminal, connections)) {
+      recordMistake('Those terminals are already connected.');
+      return;
+    }
+
+    if (!correctConnections.some((target) => samePair(first, terminal, target))) {
+      recordMistake('Incorrect connection. Try another terminal.');
+      return;
+    }
+
+    setConnections((current) => [...current, [first, terminal]]);
     setMessage('Connection accepted.');
   };
 
@@ -212,7 +218,7 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
 
           <div className="drawFooter">
             <span className="drawStatus">{complete ? `✓ ${t(lang,'Circuit complete.')}` : `${Object.keys(placed).length}/4 components placed • ${correctCount}/${correctConnections.length} connections`}</span>
-            <button className="drawFinish" disabled={!complete} onClick={() => onFinish(20)}>{t(lang,'Finish activity →')}</button>
+            <button className="drawFinish" disabled={!complete} onClick={() => onFinish(Math.max(0,20 - mistakes*2), { attempts, mistakes })}>{t(lang,'Finish activity →')}</button>
           </div>
         </section>
       </div>
