@@ -30,9 +30,35 @@ const challenges: Challenge[] = [
       { id: 'bulb-short', text: 'The bulb is short-circuited by another wire, bypassing the lamp.' },
       { id: 'high-resistance', text: 'The bulb has too much resistance for the battery to supply current.' }
     ],
-    assets: [
-      { key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }
-    ]
+    assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
+  },
+  {
+    title: 'Scenario Challenge — Identify the Fault Type',
+    symptom: 'The same 3D circuit shows a visible gap in the conductor near the switch. The bulb remains off because the current path is interrupted.',
+    question: 'How should the visible fault in this circuit be classified?',
+    correct: 'open-circuit',
+    explanation: 'A break or disconnection in the conducting path is an open circuit. With the path open, current cannot complete the loop and the lamp cannot operate.',
+    options: [
+      { id: 'open-circuit', text: 'It is an open-circuit fault caused by a broken or disconnected conductor.' },
+      { id: 'short-circuit', text: 'It is a short circuit that bypasses the bulb.' },
+      { id: 'overload', text: 'It is an overload caused by excessive current through the bulb.' },
+      { id: 'polarity', text: 'It is a polarity fault caused by reversing the battery terminals.' }
+    ],
+    assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
+  },
+  {
+    title: 'Scenario Challenge — Safe First Action',
+    symptom: 'The technician has identified the visible open circuit and is preparing to inspect the wiring around the switch before any repair is attempted.',
+    question: 'What is the appropriate first action before working on the electrical circuit?',
+    correct: 'deenergize-verify',
+    explanation: 'Before working on an electrical circuit, isolate/de-energize it and verify the de-energized condition with appropriate test equipment. This reduces the risk of electrical shock during inspection or repair.',
+    options: [
+      { id: 'deenergize-verify', text: 'De-energize the circuit and verify that it is safely de-energized before working on it.' },
+      { id: 'replace-bulb', text: 'Replace the bulb immediately without checking the circuit.' },
+      { id: 'bypass-switch', text: 'Bypass the switch with another wire while the circuit is energized.' },
+      { id: 'increase-voltage', text: 'Increase the battery voltage to force current through the circuit.' }
+    ],
+    assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
   }
 ]
 
@@ -179,13 +205,16 @@ function createProceduralComponent(key: 'battery' | 'bulb' | 'variableResistor')
   return group;
 }
 
-export default function InteractiveActivity({ onFinish }: { onFinish: (score: number, selectedAnswer: string | null, correct: boolean) => void }) {
+type ScenarioResult = { challenge: number; selected: string | null; correct: boolean };
+
+export default function InteractiveActivity({ onFinish }: { onFinish: (score: number, results: ScenarioResult[]) => void }) {
   const lang = useLanguage();
   const mount = useRef<HTMLDivElement>(null);
   const [round, setRound] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [checked, setChecked] = useState(false);
   const [score, setScore] = useState(0);
+  const [scenarioResults, setScenarioResults] = useState<ScenarioResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [notice, setNotice] = useState('');
   const challenge = challenges[round];
@@ -362,10 +391,18 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
   };
 
   const next = () => {
+    const nextScore = score + (selected === challenge.correct ? 5 : 0);
+    const result: ScenarioResult = {
+      challenge: round + 1,
+      selected,
+      correct: selected === challenge.correct
+    };
     if (round === challenges.length - 1) {
-      onFinish(score, challenge.options.find(option => option.id === selected)?.text ?? null, selected === challenge.correct);
+      onFinish(nextScore, [...scenarioResults, result]);
       return;
     }
+    setScore(nextScore);
+    setScenarioResults(current => [...current, result]);
     setRound(current => current + 1);
   };
 
