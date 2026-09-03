@@ -363,7 +363,7 @@ export default function InteractiveActivity({ onFinish }: { onFinish: (score: nu
 
   const next = () => {
     if (round === challenges.length - 1) {
-      onFinish(score, selected, selected === challenge.correct);
+      onFinish(score, challenge.options.find(option => option.id === selected)?.text ?? null, selected === challenge.correct);
       return;
     }
     setRound(current => current + 1);
