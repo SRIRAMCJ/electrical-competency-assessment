@@ -68,7 +68,7 @@ export default function App(){
  if(stage==='activity')return <InteractiveActivity onFinish={(score,answer,correct)=>{setActivityScore(score);setActivityAnswer(answer);setActivityCorrect(correct);setStage('practical')}}/>;
  if(stage==='drawing')return <Shell><Header title="Final Practical Assembly"/><CircuitDrawingActivity onFinish={(score)=>{setDrawingScore(score);setStage('result')}}/></Shell>;
  if(stage==='result')return <Result knowledge={knowledge} practical={practical} drawing={drawingScore} total={total} percentage={percentage} activityAnswer={activityAnswer} activityCorrect={activityCorrect} onReset={reset}/>;
- return <Practical {...{placed,setPlaced,connections,setConnections,selected,setSelected,errors,setErrors,switchOn,setSwitchOn,notice,setNotice,allPlaced,complete,lampOn,onFinish:()=>setStage('drawing')}}/>;
+ return <Practical {...{placed,setPlaced,connections,setConnections,selected,setSelected,errors,setErrors,switchOn,setSwitchOn,notice,setNotice,allPlaced,complete,lampOn,selectedColor,setSelectedColor,onFinish:()=>setStage('drawing')}}/>;
 }
 
 function Shell({children}:{children:ReactNode}){return <div className="page"><style>{css}</style>{children}</div>}
