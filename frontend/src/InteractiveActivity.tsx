@@ -18,43 +18,8 @@ type Challenge = {
 
 const challenges: Challenge[] = [
   {
-    title: 'Fault 1 — Open Circuit',
-    symptom: 'The 12V bulb is connected to the battery, but it is not illuminating.',
-    question: 'What most likely happened to this circuit?',
-    correct: 'open',
-    explanation: 'The return path is intentionally broken. Current cannot complete the loop from the bulb back to the battery.',
-    options: [
-      { id: 'open', text: 'The return wire is disconnected, creating an open circuit.' },
-      { id: 'reverse', text: 'The battery polarity is reversed, so the bulb cannot work.' },
-      { id: 'short', text: 'The bulb is short-circuited by a second parallel path.' },
-      { id: 'high', text: 'The battery voltage is too high for the circuit.' }
-    ],
-    assets: [
-      { key: 'battery', x: -2.6, size: 1.7 },
-      { key: 'bulb', x: 2.5, size: 1.9 }
-    ]
-  },
-  {
-    title: 'Fault 2 — Excessive Resistance',
-    symptom: 'The 12V bulb is connected to the battery, but it is glowing much dimmer than expected.',
-    question: 'What is the most likely cause shown by the circuit?',
-    correct: 'resistance',
-    explanation: 'The variable resistor is in series with the lamp. Excessive resistance limits current and makes the bulb dim.',
-    options: [
-      { id: 'resistance', text: 'The variable resistor is set too high, restricting the current.' },
-      { id: 'open', text: 'The battery is completely disconnected from the circuit.' },
-      { id: 'short', text: 'The bulb is directly shorted across the battery.' },
-      { id: 'voltage', text: 'The voltmeter is increasing the circuit voltage.' }
-    ],
-    assets: [
-      { key: 'battery', x: -3.0, size: 1.55 },
-      { key: 'variableResistor', x: 0, size: 2.0 },
-      { key: 'bulb', x: 3.0, size: 1.8 }
-    ]
-  },
-  {
-    title: 'Fault 3 — Complete Circuit Inspection',
-    symptom: 'A technician must diagnose the supplied physical circuit and determine the correct measurement method.',
+    title: 'Circuit Challenge — Complete Circuit Inspection',
+    symptom: 'Inspect the supplied physical circuit and determine the correct measurement method before taking a reading.',
     question: 'Which situation correctly explains what should happen during the measurement?',
     correct: 'ammeter',
     explanation: 'Inspect the complete authored circuit first. An ammeter measures current and is connected in series; a voltmeter measures voltage across a component.',
@@ -68,7 +33,7 @@ const challenges: Challenge[] = [
       { key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }
     ]
   }
-];
+]
 
 function material(color: number, options: THREE.MeshStandardMaterialParameters = {}) {
   return new THREE.MeshStandardMaterial({ color, roughness: 0.5, ...options });
