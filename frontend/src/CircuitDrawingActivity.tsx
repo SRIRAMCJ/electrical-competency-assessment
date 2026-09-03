@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { t, useLanguage } from './i18n';
 
 type Item = 'battery' | 'ammeter' | 'lamp' | 'rheostat';
 type Pos = { x: number; y: number };
@@ -58,6 +59,7 @@ const pairAlreadyConnected = (a: Terminal, b: Terminal, connections: Connection[
   connections.some((connection) => samePair(a, b, connection));
 
 export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score: number) => void }) {
+  const lang = useLanguage();
   const [placed, setPlaced] = useState<Partial<Record<Item, Pos>>>({});
   const [selected, setSelected] = useState<Terminal | null>(null);
   const [connections, setConnections] = useState<Connection[]>([]);
@@ -159,20 +161,20 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
       `}</style>
 
       <div className="drawHead">
-        <div><div className="eyebrow">STAGE 4 • CIRCUIT ASSEMBLY</div><h1>Electrical <span>Circuit Assembly</span></h1><p>Assemble the circuit.</p></div>
+        <div><div className="eyebrow">STAGE 4 • CIRCUIT ASSEMBLY</div><h1>{lang==='en'?'Electrical':lang==='hi'?'इलेक्ट्रिकल':'ଇଲେକ୍ଟ୍ରିକାଲ୍'} <span>{t(lang,'Electrical Circuit Assembly')}</span></h1><p>{lang==='en'?'Assemble the circuit.':lang==='hi'?'सर्किट को असेंबल करें।':'ସର୍କିଟ୍ ଅସେମ୍ବଲ କରନ୍ତୁ।'}</p></div>
         <div className="drawCounter"><b>{correctCount}/{correctConnections.length}</b><small>connections</small></div>
       </div>
 
       <div className="drawBody">
         <aside className="drawTray">
-          <h3>Components</h3>
+          <h3>{t(lang,'Components')}</h3>
           {(Object.keys(items) as Item[]).map((item) => (
             <div key={item} className="drawItem" draggable onDragStart={() => setDrag(item)}>
               <span>{items[item].symbol}</span><div>{items[item].name}<small>{placed[item] ? 'Placed' : 'Drag to board'}</small></div>
             </div>
           ))}
           <div className={`statusMessage ${message.startsWith('Incorrect') ? 'error' : message === 'Connection accepted.' ? 'ok' : ''}`}>
-            {message || 'Drag all four components onto the board, then connect the large terminal circles.'}
+            {message || t(lang,'Drag all four components onto the board, then connect the large terminal circles.')}
           </div>
         </aside>
 
@@ -209,8 +211,8 @@ export default function CircuitDrawingActivity({ onFinish }: { onFinish: (score:
           </div>
 
           <div className="drawFooter">
-            <span className="drawStatus">{complete ? '✓ Circuit complete.' : `${Object.keys(placed).length}/4 components placed • ${correctCount}/${correctConnections.length} connections`}</span>
-            <button className="drawFinish" disabled={!complete} onClick={() => onFinish(20)}>Finish activity →</button>
+            <span className="drawStatus">{complete ? `✓ ${t(lang,'Circuit complete.')}` : `${Object.keys(placed).length}/4 components placed • ${correctCount}/${correctConnections.length} connections`}</span>
+            <button className="drawFinish" disabled={!complete} onClick={() => onFinish(20)}>{t(lang,'Finish activity →')}</button>
           </div>
         </section>
       </div>
