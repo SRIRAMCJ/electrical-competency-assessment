@@ -33,30 +33,30 @@ const challenges: Challenge[] = [
     assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
   },
   {
-    title: 'Scenario Challenge — Identify the Fault Type',
-    symptom: 'The same 3D circuit shows a visible gap in the conductor near the switch. The bulb remains off because the current path is interrupted.',
-    question: 'How should the visible fault in this circuit be classified?',
-    correct: 'open-circuit',
-    explanation: 'A break or disconnection in the conducting path is an open circuit. With the path open, current cannot complete the loop and the lamp cannot operate.',
+    title: 'Scenario Challenge — Suspected Blown Fuse',
+    symptom: 'A technician is troubleshooting a 12 V lamp circuit that is not operating. The fuse is suspected, but the circuit must be checked safely before replacing any component.',
+    question: 'What is the best diagnostic method for confirming whether the fuse is open?',
+    correct: 'fuse-continuity-isolated',
+    explanation: 'Isolate the circuit from its power source and check continuity across the fuse with an appropriate meter. An open reading indicates that the fuse has failed.',
     options: [
-      { id: 'open-circuit', text: 'It is an open-circuit fault caused by a broken or disconnected conductor.' },
-      { id: 'short-circuit', text: 'It is a short circuit that bypasses the bulb.' },
-      { id: 'overload', text: 'It is an overload caused by excessive current through the bulb.' },
-      { id: 'polarity', text: 'It is a polarity fault caused by reversing the battery terminals.' }
+      { id: 'fuse-continuity-isolated', text: 'De-energize the circuit and check continuity across the fuse with a meter.' },
+      { id: 'fuse-visual-only', text: 'Replace the fuse immediately without testing it.' },
+      { id: 'fuse-current-series', text: 'Connect the meter in series across the fuse while the circuit is energized.' },
+      { id: 'fuse-increase-voltage', text: 'Increase the supply voltage to see whether the fuse starts conducting.' }
     ],
     assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
   },
   {
-    title: 'Scenario Challenge — Safe First Action',
-    symptom: 'The technician has identified the visible open circuit and is preparing to inspect the wiring around the switch before any repair is attempted.',
-    question: 'What is the appropriate first action before working on the electrical circuit?',
-    correct: 'deenergize-verify',
-    explanation: 'Before working on an electrical circuit, isolate/de-energize it and verify the de-energized condition with appropriate test equipment. This reduces the risk of electrical shock during inspection or repair.',
+    title: 'Scenario Challenge — Verify Voltage at the Lamp',
+    symptom: 'The lamp circuit has been inspected and the technician now needs to determine whether the lamp is receiving the expected supply voltage before replacing the bulb.',
+    question: 'How should a voltmeter be connected to verify the voltage available at the lamp?',
+    correct: 'voltmeter-parallel-lamp',
+    explanation: 'A voltmeter measures potential difference, so it should be connected in parallel across the two lamp terminals. This allows the technician to determine whether the expected voltage is present at the load.',
     options: [
-      { id: 'deenergize-verify', text: 'De-energize the circuit and verify that it is safely de-energized before working on it.' },
-      { id: 'replace-bulb', text: 'Replace the bulb immediately without checking the circuit.' },
-      { id: 'bypass-switch', text: 'Bypass the switch with another wire while the circuit is energized.' },
-      { id: 'increase-voltage', text: 'Increase the battery voltage to force current through the circuit.' }
+      { id: 'voltmeter-parallel-lamp', text: 'Connect the voltmeter in parallel across the lamp terminals.' },
+      { id: 'voltmeter-series-lamp', text: 'Connect the voltmeter in series with the lamp.' },
+      { id: 'ammeter-parallel-lamp', text: 'Use an ammeter in parallel across the lamp terminals.' },
+      { id: 'battery-as-meter', text: 'Use the battery itself as the voltage-measuring instrument.' }
     ],
     assets: [{ key: 'circuit', x: 0, y: 0, z: 0, size: 5.8 }]
   }
