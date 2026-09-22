@@ -10,18 +10,71 @@ type Part='battery'|'fuse'|'switch'|'lamp';
 type Terminal='bp'|'bm'|'fi'|'fo'|'si'|'so'|'lp'|'lm';
 type Connection={a:Terminal;b:Terminal;color:Color};
 
-const questions:Question[]=[
- {q:'What is the SI unit of electrical current?',options:['Volt','Ampere','Ohm','Watt'],answer:'Ampere'},
- {q:'Which instrument measures electrical current?',options:['Voltmeter','Ammeter','Ohmmeter','Wattmeter'],answer:'Ammeter'},
- {q:"Which equation represents Ohm's law?",options:['V = I × R','P = V × I','R = V × I','I = V × R'],answer:'V = I × R'},
- {q:'What is the SI unit of resistance?',options:['Ampere','Volt','Ohm','Watt'],answer:'Ohm'},
- {q:'What is the primary purpose of a fuse?',options:['Increase voltage','Protect against excessive current','Store energy','Measure current'],answer:'Protect against excessive current'},
- {q:'In a series circuit, total resistance is:',options:['The sum of resistances','Always zero','The smallest resistance','The largest resistance'],answer:'The sum of resistances'},
- {q:'Which current periodically changes direction?',options:['DC','AC','Static current','Leakage current'],answer:'AC'},
- {q:'What is the SI unit of electrical power?',options:['Watt','Ohm','Coulomb','Ampere'],answer:'Watt'},
- {q:'In an ideal parallel circuit, what is common across each branch?',options:['Voltage','Resistance','Power','Energy'],answer:'Voltage'},
- {q:'Which device opens or closes an electrical circuit?',options:['Transformer','Switch','Resistor','Capacitor'],answer:'Switch'}
+const electricalQuestionBank:Question[]=[
+ {q:'Electrical current is measured in:',options:['Volt','Ampere','Ohm','Watt'],answer:'Ampere'},
+ {q:'Which instrument measures voltage?',options:['Ammeter','Voltmeter','Megger','Wattmeter'],answer:'Voltmeter'},
+ {q:'Unit of electrical resistance is:',options:['Volt','Ampere','Ohm','Watt'],answer:'Ohm'},
+ {q:"Ohm's law states:",options:['V = IR','P = VI','I = P/V','R = V/P'],answer:'V = IR'},
+ {q:'Which device protects circuit from overload?',options:['Switch','Fuse','Plug','Socket'],answer:'Fuse'},
+ {q:'MCB stands for:',options:['Main Circuit Breaker','Miniature Circuit Breaker','Manual Control Breaker','Motor Control Board'],answer:'Miniature Circuit Breaker'},
+ {q:'Earth wire color is generally:',options:['Red','Blue','Green','Black'],answer:'Green'},
+ {q:'Purpose of earthing is to:',options:['Increase voltage','Prevent shock','Increase load','Reduce current'],answer:'Prevent shock'},
+ {q:'Which motor is most commonly used in industry?',options:['DC motor','Stepper motor','AC induction motor','Servo motor'],answer:'AC induction motor'},
+ {q:'AC supply frequency in India is:',options:['40 Hz','50 Hz','60 Hz','100 Hz'],answer:'50 Hz'},
+ {q:'Star-delta starter is used to:',options:['Increase speed','Reduce starting current','Increase torque','Reduce voltage permanently'],answer:'Reduce starting current'},
+ {q:'Which instrument measures insulation resistance?',options:['Multimeter','Megger','Ammeter','Clamp meter'],answer:'Megger'},
+ {q:'Short circuit causes:',options:['Low current','High current','No current','Normal current'],answer:'High current'},
+ {q:'Power factor is ratio of:',options:['Voltage/Current','Active power/Apparent power','Current/Resistance','Resistance/Voltage'],answer:'Active power/Apparent power'},
+ {q:'Low power factor causes:',options:['Less losses','High losses','No effect','Voltage increase'],answer:'High losses'},
+ {q:'Capacitor is used to:',options:['Increase current','Improve power factor','Reduce voltage','Increase resistance'],answer:'Improve power factor'},
+ {q:'Which motor has slip?',options:['DC motor','Synchronous motor','Induction motor','Servo motor'],answer:'Induction motor'},
+ {q:'Phase sequence tester checks:',options:['Voltage','Current','Phase order','Frequency'],answer:'Phase order'},
+ {q:'Cable size selection depends on:',options:['Length','Current','Voltage drop','All of the above'],answer:'All of the above'},
+ {q:'Contactors are used for:',options:['Measurement','Switching power circuits','Protection only','Lighting'],answer:'Switching power circuits'},
+ {q:'Relay works on principle of:',options:['Heat','Magnetism','Light','Pressure'],answer:'Magnetism'},
+ {q:'Which motor is used for variable speed drives?',options:['Induction motor','DC motor','Stepper motor','All'],answer:'All'},
+ {q:'VFD stands for:',options:['Variable Frequency Drive','Voltage Frequency Device','Variable Flow Drive','Voltage Flow Device'],answer:'Variable Frequency Drive'},
+ {q:'Main purpose of VFD is to:',options:['Increase torque','Control motor speed','Reduce power','Increase voltage'],answer:'Control motor speed'},
+ {q:'Electrical shock severity depends on:',options:['Voltage','Current','Time','All of the above'],answer:'All of the above'},
+ {q:'LOTO stands for:',options:['Lock Out Tag Out','Line Operation Test Output','Load Output Transfer Operation','Local Operating Tool'],answer:'Lock Out Tag Out'},
+ {q:'Which PPE is mandatory for electrical work?',options:['Cotton gloves','Insulated gloves','Leather gloves','Wool gloves'],answer:'Insulated gloves'},
+ {q:'Panel doors should be:',options:['Open','Locked','Removed','Wooden'],answer:'Locked'},
+ {q:'Electrical fire is extinguished using:',options:['Water','Foam','CO₂','Sand only'],answer:'CO₂'},
+ {q:'Cable insulation damage can cause:',options:['Short circuit','Shock','Fire','All'],answer:'All'},
+ {q:'Transformer converts:',options:['AC to DC','Voltage level','Frequency','Power factor'],answer:'Voltage level'},
+ {q:'Transformer works on:',options:['Electrostatic induction','Electromagnetic induction','Heat','Chemical reaction'],answer:'Electromagnetic induction'},
+ {q:'Motor overheating may be due to:',options:['Overload','Low voltage','Poor ventilation','All'],answer:'All'},
+ {q:'Which test checks continuity?',options:['Megger','Multimeter','Wattmeter','Clamp meter'],answer:'Multimeter'},
+ {q:'Clamp meter measures:',options:['Voltage','Resistance','Current without contact','Frequency only'],answer:'Current without contact'},
+ {q:'Neutral wire carries:',options:['Supply current','Return current','Earth current','Fault current'],answer:'Return current'},
+ {q:'Which is not a conductor?',options:['Copper','Aluminum','Rubber','Silver'],answer:'Rubber'},
+ {q:'DC supply polarity is:',options:['Fixed','Alternating','Variable','Random'],answer:'Fixed'},
+ {q:'Insulation class of motor indicates:',options:['Speed','Temperature limit','Voltage','Current'],answer:'Temperature limit'},
+ {q:'Star connection gives:',options:['High current','High voltage per phase','Low starting current','High torque'],answer:'Low starting current'},
+ {q:'Delta connection gives:',options:['Low torque','High starting torque','Low voltage','No current'],answer:'High starting torque'},
+ {q:'Single phasing causes:',options:['Smooth running','Motor damage','No effect','Better efficiency'],answer:'Motor damage'},
+ {q:'Which instrument measures power?',options:['Voltmeter','Ammeter','Wattmeter','Megger'],answer:'Wattmeter'},
+ {q:'Insulation resistance should be measured:',options:['Weekly','Monthly','Before commissioning','All'],answer:'All'},
+ {q:'Loose connection results in:',options:['Heating','Sparking','Fire risk','All'],answer:'All'},
+ {q:'Electrical permit ensures:',options:['Fast work','Safe work','Cheap work','Easy work'],answer:'Safe work'},
+ {q:'Which motor is self-starting?',options:['Synchronous','Induction','Stepper','Servo'],answer:'Induction'},
+ {q:'Which fault causes MCB trip?',options:['Overload','Short circuit','Earth fault','All'],answer:'All'},
+ {q:'Proper labeling of panel improves:',options:['Confusion','Safety','Delay','Cost'],answer:'Safety'},
+ {q:'Electrical maintenance reduces:',options:['Downtime','Safety','Efficiency','Power'],answer:'Downtime'}
 ];
+
+const selectRandomQuestions = (source: Question[], count = 10): Question[] => {
+  if (source.length < count) {
+    throw new Error(`Electrical question bank must contain at least ${count} questions.`);
+  }
+  const shuffled = [...source];
+  for (let i = shuffled.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+};
+
 
 const parts:Record<Part,{name:string;icon:string;sub:string}>={
  battery:{name:'12V Battery',icon:'/assets/electrical/battery.svg',sub:'DC source'},
@@ -41,6 +94,7 @@ const wire:Record<Color,string>={Red:'#dc2626',Blue:'#2563eb',Black:'#111827'};
 export default function App(){
  const[started,setStarted]=useState(false);
  const[stage,setStage]=useState<'quiz'|'activity'|'practical'|'drawing'|'result'>('quiz');
+ const[questions,setQuestions]=useState<Question[]>(()=>selectRandomQuestions(electricalQuestionBank));
  const[index,setIndex]=useState(0);
  const[activityScore,setActivityScore]=useState(0);
  const[activityAnswer,setActivityAnswer]=useState<string|null>(null);
@@ -66,9 +120,9 @@ export default function App(){
  const practical=Math.max(0,Math.min(60,connections.length*10+(complete?5:0)-errors*2+activityScore));
  const total=knowledge+practical+drawingScore;
  const percentage=Math.round(total/90*100);
- const reset=()=>{setStarted(false);setStage('quiz');setIndex(0);setActivityScore(0);setActivityAnswer(null);setActivityCorrect(false);setDrawingScore(0);setDrawingAttempts(0);setDrawingMistakes(0);setScenarioResults([]);setAnswers({});setTime(600);setPlaced({battery:false,fuse:false,switch:false,lamp:false});setConnections([]);setSelected(null);setErrors(0);setSwitchOn(false);setNotice('Drag all four materials from the tray into the assembly area.')};
- if(!started)return <Start onStart={()=>setStarted(true)}/>;
- if(stage==='quiz')return <Quiz index={index} setIndex={setIndex} answers={answers} setAnswers={setAnswers} time={time} onDone={()=>setStage('activity')}/>;
+ const reset=()=>{setStarted(false);setStage('quiz');setQuestions(selectRandomQuestions(electricalQuestionBank));setIndex(0);setActivityScore(0);setActivityAnswer(null);setActivityCorrect(false);setDrawingScore(0);setDrawingAttempts(0);setDrawingMistakes(0);setScenarioResults([]);setAnswers({});setTime(600);setPlaced({battery:false,fuse:false,switch:false,lamp:false});setConnections([]);setSelected(null);setErrors(0);setSwitchOn(false);setNotice('Drag all four materials from the tray into the assembly area.')};
+ if(!started)return <Start onStart={()=>{setQuestions(selectRandomQuestions(electricalQuestionBank));setStarted(true)}}/>;
+ if(stage==='quiz')return <Quiz questions={questions} index={index} setIndex={setIndex} answers={answers} setAnswers={setAnswers} time={time} onDone={()=>setStage('activity')}/>;
  if(stage==='activity')return <InteractiveActivity onFinish={(score,results)=>{setActivityScore(score);setScenarioResults(results);const last=results[results.length-1];setActivityAnswer(last?.selected||null);setActivityCorrect(last?.correct||false);setStage('practical')}}/>;
  if(stage==='drawing')return <Shell><Header title="Final Practical Assembly"/><CircuitDrawingActivity onFinish={(score,stats)=>{setDrawingScore(score);setDrawingAttempts(stats.attempts);setDrawingMistakes(stats.mistakes);setStage('result')}}/></Shell>;
  if(stage==='result')return <Result knowledge={knowledge} practical={practical} drawing={drawingScore} total={total} percentage={percentage} activityAnswer={activityAnswer} activityCorrect={activityCorrect} scenarioResults={scenarioResults} drawingAttempts={drawingAttempts} drawingMistakes={drawingMistakes} onReset={reset}/>;
@@ -80,7 +134,7 @@ function Header({title,timer}:{title:string;timer?:string}){const lang=useLangua
 
 function Start({onStart}:{onStart:()=>void}){const lang=useLanguage();const modules=[{key:'electrical',title:'ELECTRICAL',desc:'Test your knowledge and practical skills in electrical systems and maintenance.',tone:'blue',icon:'⚡',image:'electrical'},{key:'mechanical',title:'MECHANICAL',desc:'Evaluate your mechanical maintenance and troubleshooting skills.',tone:'green',icon:'⚙',image:'mechanical'},{key:'instrumentation',title:'INSTRUMENTATION & PLC',desc:'Assess your instrumentation, control systems and PLC knowledge.',tone:'orange',icon:'▣',image:'instrumentation'},{key:'civil',title:'CIVIL & INFRA',desc:'Test your civil construction and infrastructure competency.',tone:'purple',icon:'▥',image:'civil'}];const select=(key:string)=>{if(key==='electrical')onStart()};return <Shell><main className="moduleHome"><div className="languageBar"><b>Language / भाषा / ଭାଷା</b><div>{(['en','hi','or'] as Language[]).map(l=><button key={l} className={lang===l?'active':''} onClick={()=>setLanguage(l)}>{l==='en'?'English':l==='hi'?'हिन्दी':'ଓଡ଼ିଆ'}</button>)}</div></div><div className="modulePrompt">{t(lang,'Choose the module you want to be assessed on')}</div><div className="moduleGrid">{modules.map(m=><article key={m.key} className={`moduleCard ${m.tone}`}><div className={`moduleImage ${m.image}`}><span className="moduleBadge">{m.icon}</span></div><h2>{t(lang,m.title)}</h2><p>{t(lang,m.desc)}</p><button className="moduleSelect" onClick={()=>select(m.key)}>{t(lang,'Select Module')}</button></article>)}</div><div className="moduleInfo"><span>ⓘ</span><b>{t(lang,'Each module contains MCQ, Scenario-Based Questions and Practical Activities.')}</b></div></main></Shell>}
 
-function Quiz({index,setIndex,answers,setAnswers,time,onDone}:{index:number;setIndex:(n:number)=>void;answers:Record<number,string>;setAnswers:Dispatch<SetStateAction<Record<number,string>>>;time:number;onDone:()=>void}){
+function Quiz({questions,index,setIndex,answers,setAnswers,time,onDone}:{questions:Question[];index:number;setIndex:(n:number)=>void;answers:Record<number,string>;setAnswers:Dispatch<SetStateAction<Record<number,string>>>;time:number;onDone:()=>void}){
  const lang=useLanguage(); const q=questions[index];
  const[skipped,setSkipped]=useState<Record<number,boolean>>({});
  const completed=questions.reduce((n,_,i)=>n+(answers[i]||skipped[i]?1:0),0);
