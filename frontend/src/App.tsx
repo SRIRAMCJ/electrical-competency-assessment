@@ -105,6 +105,160 @@ const civilPainterQuestionBank:Question[]=[
 ];
 
 const selectCivilQuestions=(count=10):Question[]=>selectRandomQuestions(civilPainterQuestionBank,count);
+
+const mechanicalQuestionBank:Question[]=[
+ {q:'Fitter’s main job is related to:',options:['Electrical wiring','Fabrication & assembly','Painting','Accounting'],answer:'Fabrication & assembly'},
+ {q:'Which tool is used to tighten hexagonal nuts?',options:['Hammer','Spanner','File','Punch'],answer:'Spanner'},
+ {q:'Clearance between mating parts allows:',options:['Rust','Easy movement','Damage','Noise'],answer:'Easy movement'},
+ {q:'Which measuring tool gives highest accuracy?',options:['Steel rule','Vernier caliper','Micrometer','Try square'],answer:'Micrometer'},
+ {q:'Try square is used to check:',options:['Flatness','Right angle','Diameter','Length'],answer:'Right angle'},
+ {q:'Which file is used for finishing work?',options:['Bastard file','Rough file','Smooth file','Rasp file'],answer:'Smooth file'},
+ {q:'Shims are used to:',options:['Increase load','Adjust alignment','Tighten bolts','Reduce weight'],answer:'Adjust alignment'},
+ {q:'Which fit allows free movement?',options:['Interference fit','Shrink fit','Clearance fit','Press fit'],answer:'Clearance fit'},
+ {q:'Hammer used in fitting shop is commonly:',options:['Sledge hammer','Ball peen hammer','Wooden mallet','All of the above'],answer:'All of the above'},
+ {q:'What does tolerance indicate?',options:['Exact size','Allowable size variation','Clearance only','Interference only'],answer:'Allowable size variation'},
+ {q:'Fasteners used for temporary joints are:',options:['Rivets','Welding','Nuts and bolts','Brazing'],answer:'Nuts and bolts'},
+ {q:'Which tool is used to remove burrs?',options:['Chisel','File','Hammer','Punch'],answer:'File'},
+ {q:'Correct method to tighten bolts is:',options:['Random order','Cross / star pattern','One side only','Loose tightening'],answer:'Cross / star pattern'},
+ {q:'Dial gauge is used to check:',options:['Weight','Run-out','Length','Width'],answer:'Run-out'},
+ {q:'Key is used to:',options:['Lock door','Transmit power','Reduce speed','Seal joint'],answer:'Transmit power'},
+ {q:'Bearing inner race fit on shaft is usually:',options:['Clearance fit','Interference fit','Loose fit','Free fit'],answer:'Interference fit'},
+ {q:'Bearing outer race fit in housing is usually:',options:['Tight fit','Interference fit','Clearance fit','Shrink fit'],answer:'Clearance fit'},
+ {q:'Bearing number 6204 bore size is:',options:['15 mm','20 mm','25 mm','30 mm'],answer:'20 mm'},
+ {q:'Hammering directly on bearing causes:',options:['Good fitting','No effect','Bearing damage','Easy mounting'],answer:'Bearing damage'},
+ {q:'Alignment of machines is important to reduce:',options:['Speed','Vibration','Power','Temperature'],answer:'Vibration'},
+ {q:'Proper lubrication helps to:',options:['Increase wear','Reduce friction','Increase noise','Damage parts'],answer:'Reduce friction'},
+ {q:'Spanner size refers to:',options:['Bolt length','Thread pitch','Distance across flats','Nut thickness'],answer:'Distance across flats'},
+ {q:'Which tool is used to cut threads externally?',options:['Tap','Die','Reamer','Drill'],answer:'Die'},
+ {q:'Feeler gauge is used to measure:',options:['Length','Diameter','Gap / clearance','Angle'],answer:'Gap / clearance'},
+ {q:'Safe working practice for fitter includes:',options:['Loose clothes','No PPE','Using correct tools','Rushing work'],answer:'Using correct tools'},
+ {q:'SWL stands for:',options:['Standard weight limit','Safe working load','Static weight load','Special working load'],answer:'Safe working load'},
+ {q:'Sling angle should preferably be:',options:['Less than 30°','30°','Above 60°','10°'],answer:'Above 60°'},
+ {q:'Tag line is used to:',options:['Lift load','Control swinging load','Increase load','Tie knot'],answer:'Control swinging load'},
+ {q:'Damaged sling should be:',options:['Used carefully','Repaired on site','Rejected','Painted'],answer:'Rejected'},
+ {q:'Correct person for slinging is:',options:['Helper','Crane operator','Rigger','Foreman'],answer:'Rigger'},
+ {q:'Center of gravity affects:',options:['Load color','Load balance','Load height','Sling length only'],answer:'Load balance'},
+ {q:'Overloading may cause:',options:['Smooth lifting','Equipment failure','Faster job','No issue'],answer:'Equipment failure'},
+ {q:'Hand signals should be given by:',options:['Anyone','Trained signalman','Supervisor only','Operator'],answer:'Trained signalman'},
+ {q:'Shackles are checked mainly for:',options:['Paint','Thread damage','Weight','Shape color'],answer:'Thread damage'},
+ {q:'Basket hitch provides:',options:['Less capacity','Better control','No balance','No safety'],answer:'Better control'},
+ {q:'Wearing helmet during lifting is:',options:['Optional','Mandatory','Not required','Only for helpers'],answer:'Mandatory'},
+ {q:'Broken wire in sling indicates:',options:['Safe condition','Normal wear','Reject condition','Minor issue'],answer:'Reject condition'},
+ {q:'Lifting plan is prepared for:',options:['Small loads','Critical lifts','Daily jobs','Cleaning'],answer:'Critical lifts'},
+ {q:'SWL marking is found on:',options:['Sling tag','Helmet','Shoe','Hook body'],answer:'Sling tag'},
+ {q:'Sudden jerking during lift should be:',options:['Encouraged','Avoided','Done quickly','Tested'],answer:'Avoided'},
+ {q:'Choker hitch reduces:',options:['Load weight','Sling capacity','Balance','Height'],answer:'Sling capacity'},
+ {q:'Knotting of sling is:',options:['Allowed','Safe','Dangerous','Recommended'],answer:'Dangerous'},
+ {q:'Proper communication improves:',options:['Confusion','Safety','Delay','Noise'],answer:'Safety'},
+ {q:'Lifting area should be:',options:['Crowded','Barricaded','Dark','Slippery'],answer:'Barricaded'},
+ {q:'Rigger must wear:',options:['PPE','Loose clothes','Slippers','Casual dress'],answer:'PPE'},
+ {q:'Crane should not lift beyond:',options:['Hook height','Radius','SWL','Speed'],answer:'SWL'},
+ {q:'Load chart shows:',options:['Crane color','Lifting capacity','Operator name','Rope length only'],answer:'Lifting capacity'},
+ {q:'Emergency stop is used during:',options:['Normal lifting','Unsafe situation','Testing','Parking'],answer:'Unsafe situation'},
+ {q:'Crane hook must have:',options:['Paint','Safety latch','Oil hole','Marking only'],answer:'Safety latch'},
+ {q:'Crane brakes are used to:',options:['Increase speed','Stop load movement','Reduce load','Change direction'],answer:'Stop load movement'},
+ {q:'Slewing means:',options:['Lifting','Lowering','Rotating','Tilting'],answer:'Rotating'},
+ {q:'Crane operation should stop during:',options:['Normal weather','High wind','Day shift','Night shift'],answer:'High wind'},
+ {q:'Daily checklist ensures:',options:['Production','Safety','Cost saving','Speed'],answer:'Safety'},
+ {q:'Crane rails must be:',options:['Rusty','Aligned','Painted','Oily'],answer:'Aligned'},
+ {q:'Lifting without signal is:',options:['Safe','Allowed','Risky','Recommended'],answer:'Risky'},
+ {q:'Load should be lifted:',options:['Suddenly','Smoothly','Jerky','Very fast'],answer:'Smoothly'},
+ {q:'Crane horn is used to:',options:['Enter gate','Warn people','Test sound','Time pass'],answer:'Warn people'},
+ {q:'Overloading can cause:',options:['Smooth lift','Crane damage','Easy work','No problem'],answer:'Crane damage'},
+ {q:'Power failure load is held by:',options:['Motor','Brake','Rope','Operator'],answer:'Brake'},
+ {q:'Limit switch prevents:',options:['Over travel','Over speed','Over load','Over heat'],answer:'Over travel'},
+ {q:'Crane should be parked with:',options:['Load hanging','Hook raised','Hook lowered','Rope loose'],answer:'Hook lowered'},
+ {q:'Only authorized person should:',options:['Signal','Operate crane','Inspect load','Tie sling'],answer:'Operate crane'},
+ {q:'Poor visibility requires:',options:['Faster work','Extra caution','Ignoring signals','Speed increase'],answer:'Extra caution'},
+ {q:'Crane operator must focus on:',options:['Mobile phone','Load & signals','Speed only','Time'],answer:'Load & signals'},
+ {q:'Crane training is:',options:['Optional','Mandatory','Not required','Only for seniors'],answer:'Mandatory'},
+ {q:'Foreman’s main duty is:',options:['Store work','Supervision','Office work','Security'],answer:'Supervision'},
+ {q:'Toolbox talk is conducted for:',options:['Salary','Safety awareness','Attendance','Discipline'],answer:'Safety awareness'},
+ {q:'PPE compliance is ensured by:',options:['Worker only','Foreman','Visitor','Storekeeper'],answer:'Foreman'},
+ {q:'Permit to work is required for:',options:['Office work','Hazardous work','Cleaning only','Lunch break'],answer:'Hazardous work'},
+ {q:'Near miss means:',options:['Accident occurred','Accident avoided','Injury happened','Equipment failed'],answer:'Accident avoided'},
+ {q:'Accident reporting helps in:',options:['Blaming','Prevention','Hiding','Delay'],answer:'Prevention'},
+ {q:'Shift handover includes:',options:['Pending jobs','Safety issues','Equipment status','All of the above'],answer:'All of the above'},
+ {q:'Unsafe act should be:',options:['Ignored','Encouraged','Corrected immediately','Delayed'],answer:'Corrected immediately'},
+ {q:'Leading by example means:',options:['Giving orders','Following safety rules','Avoiding work','Punishing workers'],answer:'Following safety rules'},
+ {q:'Good communication improves:',options:['Confusion','Safety & productivity','Delay','Stress'],answer:'Safety & productivity'},
+ {q:'Job hazard analysis identifies:',options:['Cost','Risk','Tools','Manpower'],answer:'Risk'},
+ {q:'Safety violations should be:',options:['Ignored','Reported','Encouraged','Hidden'],answer:'Reported'},
+ {q:'Daily briefing helps to:',options:['Waste time','Improve clarity','Reduce work','Increase confusion'],answer:'Improve clarity'},
+ {q:'Foreman acts as link between:',options:['Worker & manager','Worker & store','Manager & HR','Safety & gate'],answer:'Worker & manager'},
+ {q:'Good supervision reduces:',options:['Accidents','Quality','Productivity','Safety'],answer:'Accidents'},
+ {q:'Welding joins metals by:',options:['Bolting','Fusion','Pressing','Riveting'],answer:'Fusion'},
+ {q:'Welding helmet protects from:',options:['Heat','Arc rays','Dust','Noise'],answer:'Arc rays'},
+ {q:'Gas cutting mainly uses:',options:['Nitrogen','Oxygen','Argon','CO₂'],answer:'Oxygen'},
+ {q:'Flashback arrestor prevents:',options:['Gas leakage','Fire','Flame return','Pressure loss'],answer:'Flame return'},
+ {q:'Wet electrode causes:',options:['Strong weld','Porosity','Smooth bead','No defect'],answer:'Porosity'},
+ {q:'Neutral flame is used for:',options:['Most welding','Cutting only','Heating only','Brazing only'],answer:'Most welding'},
+ {q:'Gas cylinders should be kept:',options:['Lying','Upright','Horizontal','Upside down'],answer:'Upright'},
+ {q:'Slag is removed by:',options:['File','Chipping hammer','Torch','Oil'],answer:'Chipping hammer'},
+ {q:'Welding fumes affect:',options:['Skin','Lungs','Legs','Hands'],answer:'Lungs'},
+ {q:'Proper earthing prevents:',options:['Shock','Noise','Heat','Smoke'],answer:'Shock'},
+ {q:'Backfire is caused by:',options:['Clean nozzle','Blocked nozzle','Correct pressure','New torch'],answer:'Blocked nozzle'},
+ {q:'Cutting tip should be cleaned with:',options:['Nail','Wire','Tip cleaner','Rod'],answer:'Tip cleaner'},
+ {q:'PPE for welder includes:',options:['Helmet','Gloves','Apron','All of the above'],answer:'All of the above'},
+ {q:'Excess current results in:',options:['Smooth weld','Burn through','Strong joint','No defect'],answer:'Burn through'},
+ {q:'Welding machine should be switched off while:',options:['Changing electrode','Welding','Testing','Running'],answer:'Changing electrode'},
+ {q:'Arc welding uses:',options:['Gas flame','Electric arc','Chemical heat','Friction'],answer:'Electric arc'},
+ {q:'Gas leakage may cause:',options:['Fire','Explosion','Injury','All of the above'],answer:'All of the above'},
+ {q:'Welding area should be:',options:['Poorly ventilated','Well ventilated','Dark','Crowded'],answer:'Well ventilated'},
+ {q:'Cracked weld is considered a:',options:['Feature','Defect','Good weld','Standard'],answer:'Defect'},
+ {q:'Pre-heating is done to:',options:['Increase speed','Reduce cracking','Improve color','Reduce cost'],answer:'Reduce cracking'},
+ {q:'Welding cable damage can cause:',options:['Shock','Fire','Short circuit','All of the above'],answer:'All of the above'},
+ {q:'Gas hose color indicates:',options:['Gas type','Length','Pressure','Size'],answer:'Gas type'},
+ {q:'Welding sparks can cause:',options:['Burn','Fire','Injury','All of the above'],answer:'All of the above'},
+ {q:'Eye protection is required due to:',options:['Dust','Arc rays','Noise','Heat only'],answer:'Arc rays'},
+ {q:'Fire extinguisher should be:',options:['Far away','Nearby','Locked','Hidden'],answer:'Nearby'},
+ {q:'Hydraulic system uses:',options:['Air','Oil','Water','Steam'],answer:'Oil'},
+ {q:'Hydraulic oil transmits:',options:['Heat','Power','Color','Noise'],answer:'Power'},
+ {q:'Pump converts:',options:['Hydraulic to mechanical','Mechanical to hydraulic','Heat to power','Pressure to noise'],answer:'Mechanical to hydraulic'},
+ {q:'Cylinder converts pressure into:',options:['Heat','Motion','Sound','Speed only'],answer:'Motion'},
+ {q:'Relief valve protects against:',options:['Leakage','Over pressure','Noise','Heat'],answer:'Over pressure'},
+ {q:'Pneumatic system uses:',options:['Oil','Air','Water','Steam'],answer:'Air'},
+ {q:'FRL unit stands for:',options:['Flow return line','Filter regulator lubricator','Fast release line','Fluid return loop'],answer:'Filter regulator lubricator'},
+ {q:'Moist air causes:',options:['Smooth operation','Corrosion','Better speed','No effect'],answer:'Corrosion'},
+ {q:'Pressure gauge measures:',options:['Flow','Pressure','Speed','Temperature'],answer:'Pressure'},
+ {q:'Leakage causes:',options:['Energy loss','Clean system','Better efficiency','No effect'],answer:'Energy loss'},
+ {q:'Check valve allows flow in:',options:['Both directions','One direction','Reverse only','No direction'],answer:'One direction'},
+ {q:'Dirty oil results in:',options:['Longer life','Component damage','Smooth working','Less wear'],answer:'Component damage'},
+ {q:'Pneumatic pressure is generally:',options:['Very high','Medium','Low','Vacuum'],answer:'Low'},
+ {q:'Filter removes:',options:['Pressure','Dirt','Speed','Heat'],answer:'Dirt'},
+ {q:'Proper maintenance improves:',options:['Breakdown','Efficiency','Leakage','Noise'],answer:'Efficiency'},
+ {q:'Hose burst can cause:',options:['Injury','Oil spill','Fire risk','All of the above'],answer:'All of the above'},
+ {q:'Air dryer removes:',options:['Oil','Moisture','Pressure','Noise'],answer:'Moisture'},
+ {q:'Clean system increases:',options:['Damage','Life of components','Leakage','Noise'],answer:'Life of components'},
+ {q:'Direction control valve controls:',options:['Speed','Direction','Pressure','Flow only'],answer:'Direction'},
+ {q:'Safety valve setting is at:',options:['Operating pressure','Maximum allowable pressure','Zero pressure','Half pressure'],answer:'Maximum allowable pressure'},
+ {q:'Lathe is mainly used for:',options:['Flat work','Cylindrical work','Grinding','Cutting sheet'],answer:'Cylindrical work'},
+ {q:'Chuck is used to hold:',options:['Tool','Job','Coolant','Belt'],answer:'Job'},
+ {q:'Drilling machine is used to make:',options:['Slots','Holes','Threads','Tapers'],answer:'Holes'},
+ {q:'Coolant is used to:',options:['Increase heat','Reduce heat','Increase wear','Damage tool'],answer:'Reduce heat'},
+ {q:'Milling machine works with:',options:['Rotating job','Rotating cutter','Hand tool','Grinding wheel'],answer:'Rotating cutter'},
+ {q:'Steel rule measures:',options:['Pressure','Length','Speed','Angle'],answer:'Length'},
+ {q:'Reaming improves:',options:['Hole accuracy','Hole depth','Hole color','Hole strength'],answer:'Hole accuracy'},
+ {q:'Grinding wheel is checked by:',options:['Load test','Ring test','Oil test','Heat test'],answer:'Ring test'},
+ {q:'Machine guard is provided for:',options:['Decoration','Safety','Speed','Noise'],answer:'Safety'},
+ {q:'Loose clothes near machines are:',options:['Allowed','Safe','Dangerous','Required'],answer:'Dangerous'},
+ {q:'Cutting speed depends on:',options:['Tool color','Material','Operator','Noise'],answer:'Material'},
+ {q:'External threading is done by:',options:['Tap','Die','Reamer','Drill'],answer:'Die'},
+ {q:'Internal threading is done by:',options:['Die','Tap','File','Punch'],answer:'Tap'},
+ {q:'Micrometer gives more accuracy than:',options:['Steel rule','Vernier','Hammer','File'],answer:'Steel rule'},
+ {q:'Workpiece should be clamped:',options:['Loosely','Securely','Randomly','Lightly'],answer:'Securely'},
+ {q:'Excessive speed causes:',options:['Long tool life','Tool wear','Smooth finish','No effect'],answer:'Tool wear'},
+ {q:'Tool angle affects:',options:['Noise','Cutting action','Weight','Length'],answer:'Cutting action'},
+ {q:'Machine cleaning should be done:',options:['During running','After shutdown','While cutting','Anytime'],answer:'After shutdown'},
+ {q:'Chips should be removed using:',options:['Hand','Air','Brush','Cloth'],answer:'Brush'},
+ {q:'Lubrication reduces:',options:['Wear','Friction','Heat','All of the above'],answer:'All of the above'},
+ {q:'Machine vibration indicates:',options:['Normal condition','Problem','Good running','High quality'],answer:'Problem'},
+ {q:'Proper lighting improves:',options:['Safety','Accuracy','Productivity','All of the above'],answer:'All of the above'},
+ {q:'Measuring tools should be kept:',options:['Dirty','Clean','Rusty','Bent'],answer:'Clean'},
+ {q:'Sharp cutting tools give:',options:['Poor finish','Better finish','Noise','Damage'],answer:'Better finish'},
+ {q:'Good workshop practice improves:',options:['Accidents','Quality & safety','Delay','Confusion'],answer:'Quality & safety'}
+];
+const selectMechanicalQuestions=(count=10):Question[]=>selectRandomQuestions(mechanicalQuestionBank,count);
 const parts:Record<Part,{name:string;icon:string;sub:string}>={
  battery:{name:'12V Battery',icon:'/assets/electrical/battery.svg',sub:'DC source'},
  fuse:{name:'Fuse',icon:'/assets/electrical/fuse.svg',sub:'Protection'},
@@ -122,9 +276,11 @@ const wire:Record<Color,string>={Red:'#dc2626',Blue:'#2563eb',Black:'#111827'};
 
 export default function App(){
  const[started,setStarted]=useState(false);
- const[stage,setStage]=useState<'quiz'|'civilQuiz'|'civilResult'|'activity'|'practical'|'drawing'|'result'>('quiz');
+ const[stage,setStage]=useState<'quiz'|'mechanicalQuiz'|'mechanicalResult'|'civilQuiz'|'civilResult'|'activity'|'practical'|'drawing'|'result'>('quiz');
  const[civilQuestions,setCivilQuestions]=useState<Question[]>(()=>selectCivilQuestions());
  const[civilAnswers,setCivilAnswers]=useState<Record<number,string>>({});
+ const[mechanicalQuestions,setMechanicalQuestions]=useState<Question[]>(()=>selectMechanicalQuestions());
+ const[mechanicalAnswers,setMechanicalAnswers]=useState<Record<number,string>>({});
  const[questions,setQuestions]=useState<Question[]>(()=>selectRandomQuestions(electricalQuestionBank));
  const[index,setIndex]=useState(0);
  const[activityScore,setActivityScore]=useState(0);
@@ -152,8 +308,10 @@ export default function App(){
  const total=knowledge+practical+drawingScore;
  const percentage=Math.round(total/90*100);
  const reset=()=>{setStarted(false);setStage('quiz');setQuestions(selectRandomQuestions(electricalQuestionBank));setIndex(0);setActivityScore(0);setActivityAnswer(null);setActivityCorrect(false);setDrawingScore(0);setDrawingAttempts(0);setDrawingMistakes(0);setScenarioResults([]);setAnswers({});setTime(600);setPlaced({battery:false,fuse:false,switch:false,lamp:false});setConnections([]);setSelected(null);setErrors(0);setSwitchOn(false);setNotice('Drag all four materials from the tray into the assembly area.')};
- if(!started)return <Start onStart={()=>{setQuestions(selectRandomQuestions(electricalQuestionBank));setStarted(true)}} onCivilStart={()=>{setCivilQuestions(selectCivilQuestions());setCivilAnswers({});setIndex(0);setTime(600);setStarted(true);setStage('civilQuiz')}}/>;
+ if(!started)return <Start onStart={()=>{setQuestions(selectRandomQuestions(electricalQuestionBank));setStarted(true)}} onMechanicalStart={()=>{setMechanicalQuestions(selectMechanicalQuestions());setMechanicalAnswers({});setIndex(0);setTime(600);setStarted(true);setStage('mechanicalQuiz')}} onCivilStart={()=>{setCivilQuestions(selectCivilQuestions());setCivilAnswers({});setIndex(0);setTime(600);setStarted(true);setStage('civilQuiz')}}/>;
  if(stage==='quiz')return <Quiz questions={questions} index={index} setIndex={setIndex} answers={answers} setAnswers={setAnswers} time={time} onDone={()=>setStage('activity')}/>;
+ if(stage==='mechanicalQuiz')return <Quiz questions={mechanicalQuestions} index={index} setIndex={setIndex} answers={mechanicalAnswers} setAnswers={setMechanicalAnswers} time={time} onDone={()=>setStage('mechanicalResult')} title="Mechanical — Technician Fundamentals"/>;
+ if(stage==='mechanicalResult')return <TradeResult title="Mechanical Assessment Result" subtitle="FITTER • RIGGER • CRANE / HOIST • FOREMAN • WELDER • HYDRAULIC / PNEUMATIC • MACHINIST" questions={mechanicalQuestions} answers={mechanicalAnswers} onRestart={()=>{setMechanicalQuestions(selectMechanicalQuestions());setMechanicalAnswers({});setIndex(0);setTime(600);setStage('mechanicalQuiz')}} onHome={()=>setStage('quiz')}/>;
  if(stage==='civilQuiz')return <Quiz questions={civilQuestions} index={index} setIndex={setIndex} answers={civilAnswers} setAnswers={setCivilAnswers} time={time} onDone={()=>setStage('civilResult')} title="Civil & Infra — Painter Fundamentals"/>;
  if(stage==='civilResult')return <CivilResult questions={civilQuestions} answers={civilAnswers} onRestart={()=>{setCivilQuestions(selectCivilQuestions());setCivilAnswers({});setIndex(0);setStage('civilQuiz')}} onHome={()=>setStage('quiz')}/>;
  if(stage==='activity')return <InteractiveActivity onFinish={(score,results)=>{setActivityScore(score);setScenarioResults(results);const last=results[results.length-1];setActivityAnswer(last?.selected||null);setActivityCorrect(last?.correct||false);setStage('practical')}}/>;
@@ -165,7 +323,7 @@ export default function App(){
 function Shell({children}:{children:ReactNode}){return <div className="page"><style>{css}</style>{children}</div>}
 function Header({title,timer}:{title:string;timer?:string}){const lang=useLanguage();return <header className="header"><div><div className="eyebrow">{t(lang,'ELECTRICAL COMPETENCY ASSESSMENT')}</div><strong>{t(lang,title)}</strong></div>{timer&&<div className="timer">⏱ {timer}</div>}</header>}
 
-function Start({onStart,onCivilStart}:{onStart:()=>void;onCivilStart:()=>void}){const lang=useLanguage();const modules=[{key:'electrical',title:'ELECTRICAL',desc:'Test your knowledge and practical skills in electrical systems and maintenance.',tone:'blue',icon:'⚡',image:'electrical'},{key:'mechanical',title:'MECHANICAL',desc:'Evaluate your mechanical maintenance and troubleshooting skills.',tone:'green',icon:'⚙',image:'mechanical'},{key:'instrumentation',title:'INSTRUMENTATION & PLC',desc:'Assess your instrumentation, control systems and PLC knowledge.',tone:'orange',icon:'▣',image:'instrumentation'},{key:'civil',title:'CIVIL & INFRA',desc:'Test your civil construction and infrastructure competency.',tone:'purple',icon:'▥',image:'civil'}];const select=(key:string)=>{if(key==='electrical'){onStart();return;}if(key==='civil'){onCivilStart();return;}};return <Shell><main className="moduleHome"><div className="languageBar"><b>Language / भाषा / ଭାଷା</b><div>{(['en','hi','or'] as Language[]).map(l=><button key={l} className={lang===l?'active':''} onClick={()=>setLanguage(l)}>{l==='en'?'English':l==='hi'?'हिन्दी':'ଓଡ଼ିଆ'}</button>)}</div></div><div className="modulePrompt">{t(lang,'Choose the module you want to be assessed on')}</div><div className="moduleGrid">{modules.map(m=><article key={m.key} className={`moduleCard ${m.tone}`}><div className={`moduleImage ${m.image}`}><span className="moduleBadge">{m.icon}</span></div><h2>{t(lang,m.title)}</h2><p>{t(lang,m.desc)}</p><button className="moduleSelect" onClick={()=>select(m.key)}>{t(lang,'Select Module')}</button></article>)}</div><div className="moduleInfo"><span>ⓘ</span><b>{t(lang,'Each module contains MCQ, Scenario-Based Questions and Practical Activities.')}</b></div></main></Shell>}
+function Start({onStart,onMechanicalStart,onCivilStart}:{onStart:()=>void;onMechanicalStart:()=>void;onCivilStart:()=>void}){const lang=useLanguage();const modules=[{key:'electrical',title:'ELECTRICAL',desc:'Test your knowledge and practical skills in electrical systems and maintenance.',tone:'blue',icon:'⚡',image:'electrical'},{key:'mechanical',title:'MECHANICAL',desc:'Evaluate your mechanical maintenance and troubleshooting skills.',tone:'green',icon:'⚙',image:'mechanical'},{key:'instrumentation',title:'INSTRUMENTATION & PLC',desc:'Assess your instrumentation, control systems and PLC knowledge.',tone:'orange',icon:'▣',image:'instrumentation'},{key:'civil',title:'CIVIL & INFRA',desc:'Test your civil construction and infrastructure competency.',tone:'purple',icon:'▥',image:'civil'}];const select=(key:string)=>{if(key==='electrical'){onStart();return;}if(key==='mechanical'){onMechanicalStart();return;}if(key==='civil'){onCivilStart();return;}};return <Shell><main className="moduleHome"><div className="languageBar"><b>Language / भाषा / ଭାଷା</b><div>{(['en','hi','or'] as Language[]).map(l=><button key={l} className={lang===l?'active':''} onClick={()=>setLanguage(l)}>{l==='en'?'English':l==='hi'?'हिन्दी':'ଓଡ଼ିଆ'}</button>)}</div></div><div className="modulePrompt">{t(lang,'Choose the module you want to be assessed on')}</div><div className="moduleGrid">{modules.map(m=><article key={m.key} className={`moduleCard ${m.tone}`}><div className={`moduleImage ${m.image}`}><span className="moduleBadge">{m.icon}</span></div><h2>{t(lang,m.title)}</h2><p>{t(lang,m.desc)}</p><button className="moduleSelect" onClick={()=>select(m.key)}>{t(lang,'Select Module')}</button></article>)}</div><div className="moduleInfo"><span>ⓘ</span><b>{t(lang,'Each module contains MCQ, Scenario-Based Questions and Practical Activities.')}</b></div></main></Shell>}
 
 function Quiz({questions,index,setIndex,answers,setAnswers,time,onDone,title='Electrical Fundamentals'}:{questions:Question[];index:number;setIndex:(n:number)=>void;answers:Record<number,string>;setAnswers:Dispatch<SetStateAction<Record<number,string>>>;time:number;onDone:()=>void;title?:string}){
  const lang=useLanguage(); const q=questions[index];
@@ -177,6 +335,11 @@ function Quiz({questions,index,setIndex,answers,setAnswers,time,onDone,title='El
  const skip=()=>{setSkipped(s=>({...s,[index]:true}));if(index<questions.length-1)setIndex(index+1)};
  const finish=()=>{if(remaining===0)onDone()};
  return <Shell><Header title={title} timer={`${mm}:${ss}`}/><div className="progress"><i style={{width:`${completed/questions.length*100}%`}}/></div><main className="quiz"><section className="card questionCard"><div className="meta"><span>{lang==='en'?'Question':lang==='hi'?'प्रश्न':'ପ୍ରଶ୍ନ'} {index+1} / {questions.length}</span><span>{lang==='en'?'MCQ • 1 point':lang==='hi'?'MCQ • 1 अंक':'MCQ • 1 ପଏଣ୍ଟ'}</span></div><div className="questionToolbar"><div><b>{t(lang,'Question navigator')}</b><small>{t(lang,'Select any question number')}</small></div><strong>{completed}/{questions.length} completed</strong></div><div className="questionNumbers">{questions.map((_,i)=>{const status=answers[i]?'answered':skipped[i]?'skipped':i===index?'current':'unanswered';return <button key={i} className={`qnum ${status}`} onClick={()=>setIndex(i)}><b>{i+1}</b>{answers[i]&&<span>✓</span>}{skipped[i]&&!answers[i]&&<span>—</span>}</button>})}</div><div className="questionLegend"><span><i className="legendAnswered"/>{t(lang,'Answered')}</span><span><i className="legendSkipped"/>{t(lang,'Skipped')}</span><span><i className="legendCurrent"/>{t(lang,'Current')}</span><span><i className="legendOpen"/>{t(lang,'Not visited')}</span></div><h2>{t(lang,q.q)}</h2><div className="options">{q.options.map((o,i)=><button key={o} className={answers[index]===o?'selected':''} onClick={()=>choose(o)}><b>{String.fromCharCode(65+i)}</b>{t(lang,o)}</button>)}</div><div className="nav"><button disabled={!index} onClick={()=>setIndex(index-1)}>← {t(lang,'Previous')}</button><div className="navActions"><button className="skipButton" onClick={skip} >{t(lang,'Skip question →')}</button>{index===questions.length-1&&remaining===0?<button className="primary" onClick={finish} >{t(lang,'Finish quiz →')}</button>:<button className="primary nextButton" disabled={index===questions.length-1&&!answers[index]&&!skipped[index]} onClick={()=>index<questions.length-1&&setIndex(index+1)} >{t(lang,'Next →')}</button>}</div></div><div className="finishBar"><span>{remaining?`${remaining} question${remaining===1?'':'s'} still need an answer or can be skipped.`:'✓ Every question is answered or skipped.'}</span>{remaining===0&&<button onClick={finish}>Finish now</button>}</div></section><aside className="card stages"><b>{t(lang,'Assessment')}</b><p>01 <strong>{t(lang,'Fundamentals')}</strong><small>10 electrical MCQs</small></p><p>02 <strong>{t(lang,'Technical validation')}</strong><small>3 scenario challenges • 15 points</small></p><p>03 <strong>{t(lang,'Practical wiring')}</strong><small>Pick, place & connect</small></p><p>04 <strong>{t(lang,'Circuit assembly')}</strong><small>Reproduce the schematic</small></p><p>05 <strong>{t(lang,'Performance report')}</strong><small>Score & competency</small></p></aside></main></Shell>
+}
+
+function TradeResult({title,subtitle,questions,answers,onRestart,onHome}:{title:string;subtitle:string;questions:Question[];answers:Record<number,string>;onRestart:()=>void;onHome:()=>void}){
+ const score=questions.reduce((n,q,i)=>n+(answers[i]===q.answer?1:0),0);
+ return <Shell><Header title={title}/><main className="quizResult card"><div className="eyebrow">MECHANICAL • MCQ</div><h1>Assessment complete</h1><div className="resultScore"><b>{score}/{questions.length}</b><span>MCQ score</span></div><p>{subtitle}</p><div className="resultActions"><button className="primary" onClick={onRestart}>New random test</button><button onClick={onHome}>Back to modules</button></div></main></Shell>
 }
 
 function CivilResult({questions,answers,onRestart,onHome}:{questions:Question[];answers:Record<number,string>;onRestart:()=>void;onHome:()=>void}){
