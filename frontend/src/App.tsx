@@ -76,6 +76,35 @@ const selectRandomQuestions = (source: Question[], count = 10): Question[] => {
 };
 
 
+const civilPainterQuestionBank:Question[]=[
+ {q:'Which tool is used for painting walls?',options:['Hammer','Brush','Spade','Chisel'],answer:'Brush'},
+ {q:'Paint is mainly used to:',options:['Strengthen walls','Decorate surfaces','Break walls','Dig soil'],answer:'Decorate surfaces'},
+ {q:'Whitewash is mixed with:',options:['Cement','Lime','Sand','Wood'],answer:'Lime'},
+ {q:'Which paint is used on metal surfaces?',options:['Distemper','Enamel','Whitewash','Cement paint'],answer:'Enamel'},
+ {q:'Primer is applied:',options:['After painting','Before painting','Never','At last'],answer:'Before painting'},
+ {q:'Which tool is used to smooth paint?',options:['Roller','Trowel','Hammer','Spade'],answer:'Roller'},
+ {q:'Putty is used to:',options:['Break walls','Fill cracks','Cut wood','Mix paint'],answer:'Fill cracks'},
+ {q:'Oil paint dries by:',options:['Sunlight','Evaporation','Chemical reaction','Water'],answer:'Chemical reaction'},
+ {q:'Which safety item is used while painting?',options:['Helmet','Gloves','Goggles','All'],answer:'All'},
+ {q:'Distemper is mainly used on:',options:['Metal','Wood','Interior walls','Roof'],answer:'Interior walls'},
+ {q:'What is used to remove old paint?',options:['Sandpaper','Roller','Brush','Tape'],answer:'Sandpaper'},
+ {q:'Paint thinner is used to:',options:['Thicken paint','Clean tools','Dry paint','Color walls'],answer:'Clean tools'},
+ {q:'Painting should be done on a surface that is:',options:['Wet','Dirty','Dry','Broken'],answer:'Dry'},
+ {q:'Number of coats normally applied is:',options:['One','Two','Four','Five'],answer:'Two'},
+ {q:'Painting improves:',options:['Strength','Appearance','Height','Weight'],answer:'Appearance'},
+ {q:'Which tool has long handle?',options:['Roller','Brush','Tray','Bucket'],answer:'Roller'},
+ {q:'Paint smell can be reduced by:',options:['Closing doors','Ventilation','Heating','Water'],answer:'Ventilation'},
+ {q:'Which color reflects more light?',options:['Black','White','Blue','Red'],answer:'White'},
+ {q:'Which paint is water-based?',options:['Oil paint','Enamel','Distemper','Varnish'],answer:'Distemper'},
+ {q:'Paint is stored in:',options:['Bags','Bottles','Cans','Boxes'],answer:'Cans'},
+ {q:'Varnish is applied on:',options:['Brick','Wood','Cement','Plastic'],answer:'Wood'},
+ {q:'Which tool spreads paint evenly?',options:['Spade','Roller','Knife','Nail'],answer:'Roller'},
+ {q:'Before painting, cracks are filled with:',options:['Oil','Water','Putty','Dust'],answer:'Putty'},
+ {q:'Painting should be avoided during:',options:['Dry weather','Rainy season','Sunny day','Morning'],answer:'Rainy season'},
+ {q:'Which is a safety rule?',options:['Drink paint','Touch wet paint','Wear mask','Sleep nearby'],answer:'Wear mask'},
+];
+
+const selectCivilQuestions=(count=10):Question[]=>selectRandomQuestions(civilPainterQuestionBank,count);
 const parts:Record<Part,{name:string;icon:string;sub:string}>={
  battery:{name:'12V Battery',icon:'/assets/electrical/battery.svg',sub:'DC source'},
  fuse:{name:'Fuse',icon:'/assets/electrical/fuse.svg',sub:'Protection'},
