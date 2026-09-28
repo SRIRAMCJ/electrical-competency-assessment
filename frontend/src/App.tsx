@@ -299,7 +299,7 @@ export default function App(){
  const[switchOn,setSwitchOn]=useState(false);
  const[notice,setNotice]=useState('Drag all four materials from the tray into the assembly area.');
  const[selectedColor,setSelectedColor]=useState<Color>('Red');
- useEffect(()=>{const logo=document.createElement('img');logo.src='https://raw.githubusercontent.com/SRIRAMCJ/electrical-competency-assessment/main/3d%20elements/Vedanta_logo_tagline_transparent.png';logo.alt='Vedanta';Object.assign(logo.style,{position:'fixed',top:'30px',left:'max(28px, calc((100vw - 1240px) / 2))',width:'140px',height:'auto',display:'block',objectFit:'contain',zIndex:'1000',pointerEvents:'none'});document.body.appendChild(logo);return()=>{logo.remove()}} ,[]);
+ useEffect(()=>{const logo=document.createElement('img');logo.src='https://raw.githubusercontent.com/SRIRAMCJ/electrical-competency-assessment/main/3d%20elements/Vedanta_logo_tagline_transparent.png';logo.alt='Vedanta';logo.setAttribute('aria-hidden','true');Object.assign(logo.style,{position:'fixed',top:'18px',left:'32px',width:'155px',height:'auto',maxWidth:'155px',display:'block',objectFit:'contain',objectPosition:'left top',zIndex:'2147483647',pointerEvents:'none',filter:'none',transform:'translateZ(0)',background:'transparent'});document.body.appendChild(logo);return()=>{logo.remove()}} ,[]);
  useEffect(()=>{if(!started||stage!=='quiz')return;const t=window.setInterval(()=>setTime(v=>{if(v<=1){setStage('activity');return 0}return v-1}),1000);return()=>window.clearInterval(t)},[started,stage]);
  const knowledge=questions.reduce((s,q,i)=>s+(answers[i]===q.answer?1:0),0);
  const allPlaced=Object.values(placed).every(Boolean);
